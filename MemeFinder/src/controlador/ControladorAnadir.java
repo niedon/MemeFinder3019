@@ -34,7 +34,8 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 	
 	private ArrayList<ImagenTemp> arrayListImagenes;
 	
-	private static final String rutaTemp = "/home/basi/eclipse-workspace/MemeFinder/src/imagenesDB/temp/"; //Poner en clase principal
+	//private static final String rutaTemp = "/home/basi/eclipse-workspace/MemeFinder/src/imagenesDB/temp/";
+	private static final String rutaTemp = "/home/basi/Imágenes/imgBD/temp/"; //Poner en clase principal
 	
 	private int contadorImagenActual;
 	

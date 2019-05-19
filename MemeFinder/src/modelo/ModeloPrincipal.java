@@ -45,7 +45,8 @@ public class ModeloPrincipal {
 	private static final String ETCOUNT = "etcount";
 	
 	
-	private static final String rutaBD = "/home/basi/eclipse-workspace/MemeFinder/src/imagenesDB/"; //Poner en clase principal
+	//private static final String rutaBD = "/home/basi/eclipse-workspace/MemeFinder/src/imagenesDB/"; //Poner en clase principal
+	private static final String rutaBD = "/home/basi/Imágenes/imgBD/";
 	
 	
 	public ModeloPrincipal() {
