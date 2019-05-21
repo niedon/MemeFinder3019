@@ -2,6 +2,7 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -37,7 +38,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	
 	private JPanel panelOpcionesBuscar;
 	private JPanel panelBuscarSinEtiqueta;
-	private JCheckBox opBuscarSinEtiqueta;
+	private JCheckBox opBuscarSinEtiqueta;//TODO añadir des/activar visualmente al pulsar
 	
 	private JPanel panelFechaDespues;
 	private JPanel panelFechaDespuesDer;
@@ -122,6 +123,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		
 		panelBuscarSinEtiqueta = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		opBuscarSinEtiqueta = new JCheckBox("Buscar imágenes sin etiquetas");
+		opBuscarSinEtiqueta.addChangeListener(this);
 		
 		panelBuscarSinEtiqueta.add(opBuscarSinEtiqueta);
 		panelOpcionesBuscar.add(panelBuscarSinEtiqueta);
@@ -330,6 +332,18 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		return botonBuscar;
 	}
 	
+	public JCheckBox getOpBuscarSinEtiqueta() {
+		return opBuscarSinEtiqueta;
+	}
+	
+	public JCheckBox getOpFechaDespues() {
+		return opFechaDespues;
+	}
+
+	public JCheckBox getOpFechaAntes() {
+		return opFechaAntes;
+	}
+	
 	public JComboBox<String> getOpAnoDespues() {
 		return opAnoDespues;
 	}
@@ -340,6 +354,26 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	
 	public int getNumeroFilas() {
 		return ((GridLayout)resultadosGrid.getLayout()).getRows();
+	}
+	
+	public String getFechaDespues() {
+		
+		
+		return (((String)opDiaDespues.getSelectedItem()).length()==1 ? "0"+((String)opDiaDespues.getSelectedItem()) : ((String)opDiaDespues.getSelectedItem()))
+				+ "/"
+				+ ((opMesDespues.getSelectedIndex()+1 < 10) ? "0"+(opMesDespues.getSelectedIndex()+1) : (opMesDespues.getSelectedIndex()+1))  
+				+ "/"
+				+ (String)opAnoDespues.getSelectedItem();
+	}
+	
+	public String getFechaAntes() {
+		
+		return (((String)opDiaAntes.getSelectedItem()).length()==1 ? "0"+((String)opDiaAntes.getSelectedItem()) : ((String)opDiaAntes.getSelectedItem()))
+				+ "/"
+				+ ((opMesAntes.getSelectedIndex()+1 < 10) ? "0"+(opMesAntes.getSelectedIndex()+1) : (opMesAntes.getSelectedIndex()+1))  
+				+ "/"
+				+ (String)opAnoAntes.getSelectedItem();
+		
 	}
 
 //	public ArrayList<ImagenTemp> getArrayResultados() {
@@ -361,16 +395,18 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		
 		resultadosGrid.removeAll();
 		
-		for(int i=0; i<res.length; i++) {
-			
-			if(res[i] != null) {
-				PanelImagenRes temp = new PanelImagenRes();
-				resultadosGrid.add(temp);
-				temp.setImagen(res[i]);
-				temp.addMouseListener(this);
+		if(res != null) {
+			for(int i=0; i<res.length; i++) {
+				
+				if(res[i] != null) {
+					PanelImagenRes temp = new PanelImagenRes();
+					resultadosGrid.add(temp);
+					temp.setImagen(res[i]);
+					temp.addMouseListener(this);
+				}
 			}
-			
 		}
+		
 		
 		resultadosGrid.revalidate();
 		resultadosGrid.repaint();
@@ -407,6 +443,31 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		resultadosEste.repaint();
 		
 	}
+	
+	private void setEnabledParaBusquedaSinEtiquetas() {
+		
+		//ojo !
+		boolean comoPoner = !opBuscarSinEtiqueta.isSelected();
+		
+//		opFechaDespues.setEnabled(comoPoner);
+//		if(opFechaDespues.isSelected()) {
+//			opDiaDespues.setEnabled(comoPoner);
+//			opMesDespues.setEnabled(comoPoner);
+//			opAnoDespues.setEnabled(comoPoner);
+//		}
+//		opFechaAntes.setEnabled(comoPoner);
+//		if(opFechaAntes.isSelected()) {
+//			opDiaAntes.setEnabled(comoPoner);
+//			opMesAntes.setEnabled(comoPoner);
+//			opAnoAntes.setEnabled(comoPoner);
+//		}
+		barraBusqueda.setEditable(comoPoner);
+		panelEtiquetas.setEnabled(comoPoner);
+		for(Component c : panelEtiquetas.getComponents()) {
+			c.setEnabled(comoPoner);
+		}
+		
+	}
 
 	
 	
@@ -423,10 +484,10 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 
 	@Override
 	public void mouseClicked(MouseEvent ev) {
-		System.out.println("reclic");
-		System.out.println(ev.getSource().getClass().getSimpleName());
+		//System.out.println("reclic");
+		//System.out.println(ev.getSource().getClass().getSimpleName());
 		if(ev.getSource().getClass().getSimpleName().equals((new PanelImagenRes()).getClass().getSimpleName())) {
-			System.out.println("clic");
+			//System.out.println("clic");
 			cambiarImagenGrande(((PanelImagenRes)ev.getSource()).getImagenTemp());
 			
 		}
@@ -490,6 +551,8 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 				opMesAntes.setEnabled(false);
 				opAnoAntes.setEnabled(false);
 			}
+		}else if(ev.getSource()==opBuscarSinEtiqueta) {
+			setEnabledParaBusquedaSinEtiquetas();
 		}
 		
 	}

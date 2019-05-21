@@ -57,8 +57,7 @@ public class Etiquetas extends JPanel{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				al.actionPerformed(new ActionEvent(Etiquetas.this,0,etiqueta));
-				//System.out.println("clic");
-				
+				//TODO desactivar este evento si etiqueta.isenabled==false
 			}
 
 			@Override
@@ -100,6 +99,16 @@ public class Etiquetas extends JPanel{
 			          || etiqueta.equals(otro.etiqueta);
 		}
 		return false;
+		
+	}
+	
+	public void setEnabled(boolean enabled) {
+		
+		super.setEnabled(enabled);
+		
+		if(enabled) this.setBackground(Color.CYAN);
+		else this.setBackground(Color.GRAY);
+		//TODO quitar o mutear el actionlistener de la X cuando esté desactivada
 		
 	}
 	

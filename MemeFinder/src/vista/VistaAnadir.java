@@ -282,7 +282,7 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		panelImagen.vaciar();
 		panelImagen.repaint();
 		panelImagen.revalidate();
-		estadoHashing.setText("Estado de hashing...");
+		estadoHashing.setText("-");
 		botonCoincidencias.setEnabled(false);
 		panelEtiquetasAnadir.removeAll();
 		panelEtiquetasAnadir.repaint();

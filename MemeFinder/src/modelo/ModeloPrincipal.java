@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -20,6 +21,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Updates;
+import static com.mongodb.client.model.Filters.*;
 
 import controlador.ImagenTemp;
 import controlador.ProxyHash;
@@ -193,87 +195,155 @@ public class ModeloPrincipal {
 		 
 	 }
 	 
-	 public ArrayList<ImagenTemp> getArrayResultados(ArrayList<Etiquetas> arrayEtiquetas){
+//	 public ArrayList<ImagenTemp> getArrayResultados(ArrayList<Etiquetas> arrayEtiquetas){
+//		 return getArrayResultados(arrayEtiquetas, null, null);
+//	 }
+	 
+	 public ArrayList<ImagenTemp> getArrayResultados(ArrayList<Etiquetas> arrayEtiquetas, Long despuesDe, Long antesDe){
 		 
-		 Document doc = new Document();
+		 Bson filtroFecha = null;
+		 FindIterable<Document> resultado = null;
 		 
-		 //Añade a etiquetasNoCero los textos de etiquetas que tienen resultados en la bd
-		 ArrayList<String> etiquetasNoCero = new ArrayList<String>();		 
-		 for(Etiquetas e : arrayEtiquetas) {
-			 if(getCountEtiquetas(e.getTexto()) != 0) {
-				 etiquetasNoCero.add(e.getTexto());
+		 if(despuesDe!= null || antesDe!=null) {
+			 
+			 if(despuesDe!= null && antesDe!=null) {
+				 filtroFecha = and(gte(FECHA,despuesDe),lte(FECHA,antesDe));
+			 }else if(despuesDe!=null) {
+				 filtroFecha=gte(FECHA,despuesDe);
+			 }else {
+				 filtroFecha=lte(FECHA,antesDe);
 			 }
 		 }
 		 
-		 //<test>
-		 System.out.print("etiquetas nonull: ");
-		 for(String s : etiquetasNoCero) { System.out.print(s + "-"); }
-		 System.out.println();
-		 //</test>
 		 
-		 /*
-		  * aquí va la magia
-		  */
+		 if(arrayEtiquetas != null) {
+			 
+			 ArrayList<String> etiquetasNoCero = new ArrayList<String>();
+			 for(Etiquetas e : arrayEtiquetas) {
+				 if(getCountEtiquetas(e.getTexto()) != 0) {
+					 etiquetasNoCero.add(e.getTexto());
+				 }
+			 }
+			 
+			 if(etiquetasNoCero.isEmpty()) {
+				 
+				 return new ArrayList<ImagenTemp>();
+				 
+			 }else {
+				 
+				 if(filtroFecha != null) {
+					 
+					 resultado = tablaImagenes.find(and(all(ETIQUETAS,etiquetasNoCero),filtroFecha));
+					 
+				 }else {
+					 
+					 resultado = tablaImagenes.find(all(ETIQUETAS,etiquetasNoCero));
+					 
+				 }
+			 }
+			 
+		 }else {
+			 
+			 if(filtroFecha != null) {
+				 
+				 resultado = tablaImagenes.find(and(new Document(ETIQUETAS,new ArrayList<String>()),filtroFecha));
+				 
+			 }else {
+				 
+				 resultado = tablaImagenes.find(new Document(ETIQUETAS,new ArrayList<String>()));
+				 
+			 }
+			 
+		 }
 		 
-//		 ArrayList<String> ttt= new ArrayList<String>();
-//		 ttt.add("aaa");
-//		 ttt.add("test");
-		 
-		 //Añade las condiciones (resultados que tengan en ETIQUETAS (al menos) todas las que estén en etiquetasNoCero)
-		 doc.append(ETIQUETAS, new Document("$all", etiquetasNoCero));
-		 
-		 
-		 
-		 FindIterable<Document> resultado = tablaImagenes.find(doc);
 		 MongoCursor<Document> iter = resultado.iterator();
 		 
 		 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
-//		 int contador = 0;//test
 		 
-		 //Parseador
 		 while(iter.hasNext()) {
 			 retorna.add(convierteDocObjeto(iter.next()));
-//			 System.out.println("tiene");//test
-//			 contador++;//test
 		 }
-//		 System.out.println(contador);
-		 
-//		 for(ImagenTemp i : retorna) {//test
-//			 System.out.println(i.getNombre()+i.getExtension() + "  --  " + i.getImagen().getAbsolutePath());
-//		 }
 		 
 		 return retorna;
 		 
-		 //---------------------------DEPRECATED?
-
-//		 //doc.append("$all", new Document(ETIQUETAS,etiquetasNoCero));
-//		 ////doc.append(ETIQUETAS, new Document("$all",Arrays.asList(etiquetasNoCero)));
-//		 
-//		 
-//		 FindIterable<Document> resultado = tablaImagenes.find(doc);
-//		 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
-//		 int contador = 0;
-//		 MongoCursor<Document> iter = resultado.iterator();
-//		 
-//		 while(iter.hasNext()) {
-//			 
-//			 retorna.add(convierteDocObjeto(iter.next()));
-//			 System.out.println("tiene");
-//			 contador++;
-//		 }
-//		 System.out.println("tamaño; " + contador);
-//		 
-////		 for(Document docum : resultado) {
-////			 retorna.add(convierteDocObjeto(doc));
+//		 System.out.println("ejecuta");
+////		 Document doc = new Document();
+////		 
+////		 if(arrayEtiquetas==null) {
+////			 doc.append(ETIQUETAS, new ArrayList<String>());
+////		 }else {
+////			 
+////			 ArrayList<String> etiquetasNoCero = new ArrayList<String>();
+////			 for(Etiquetas e : arrayEtiquetas) {
+////				 if(getCountEtiquetas(e.getTexto()) != 0) {
+////					 etiquetasNoCero.add(e.getTexto());
+////				 }
+////				 doc.append(ETIQUETAS, new Document("$all", etiquetasNoCero));
+////			 
+////			 }
+////			 
 ////		 }
 //		 
-//		 for(ImagenTemp i : retorna) {
-//			 System.out.println(i.getNombre()+i.getExtension() + "  --  " + i.getImagen().getAbsolutePath());
+//		 //Document ttttt = (Document) tablaEtiquetas.find(eq("address.city", "Wimborne")).first();
+//		 
+//		 
+//		 
+//		 
+//		 
+//		 
+//		 if(arrayEtiquetas != null) {
+//			 
+//			 //Document doc = new Document();
+//			 
+//			 //Añade a etiquetasNoCero los textos de etiquetas que tienen resultados en la bd
+//			 ArrayList<String> etiquetasNoCero = new ArrayList<String>();		 
+//			 for(Etiquetas e : arrayEtiquetas) {
+//				 if(getCountEtiquetas(e.getTexto()) != 0) {
+//					 etiquetasNoCero.add(e.getTexto());
+//				 }
+//			 }
+//			 
+////			 //<test>
+////			 System.out.print("etiquetas nonull: ");
+////			 for(String s : etiquetasNoCero) { System.out.print(s + "-"); }
+////			 System.out.println();
+////			 //</test>
+//			 
+//			 //doc.append(ETIQUETAS, new Document("$all", etiquetasNoCero));
+//			 
+//			 
+//			 
+//			 
+//			 //FindIterable<Document> resultado = tablaImagenes.find(doc);
+//			 FindIterable<Document> resultado = tablaImagenes.find(all(ETIQUETAS,etiquetasNoCero));
+//			 MongoCursor<Document> iter = resultado.iterator();
+//			 
+//			 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
+//			 
+//			 //Parseador
+//			 while(iter.hasNext()) {
+//				 
+//				 retorna.add(convierteDocObjeto(iter.next()));
+//			 }
+//			 
+//			 return retorna;
+//			 
+//		 }else {
+//			 
+//			 //Document doc = new Document(ETIQUETAS, new ArrayList<String>());
+//			 FindIterable<Document> resultado = tablaImagenes.find(new Document(ETIQUETAS, new ArrayList<String>()));
+//			 MongoCursor<Document> iter = resultado.iterator();
+//			 
+//			 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
+//			 
+//			 while(iter.hasNext()) {
+//				 retorna.add(convierteDocObjeto(iter.next()));
+//			 }
+//			 
+//			 return retorna;
+//			 
 //		 }
-//		 
-//		 
-//		 
-//		 return retorna;
+		 
 	 }
 	 
 	 
