@@ -183,6 +183,10 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		return botonEnviarAnadir;
 	}
 	
+	public JButton getBotonCancelarAnadir() {
+		return botonCancelarAnadir;
+	}
+	
 	public JLabel getFlechaIzq() {
 		return panelImagen.getFlechaIzq();
 	}
@@ -216,8 +220,9 @@ public class VistaAnadir extends JPanel implements ActionListener{
 			}
 		}
 		
-		if(imagenTemp.getPHash().equals("")) {
+		if(imagenTemp.getPHash() == null) {
 			
+			System.out.println("hashing en proceso, getphash==null");
 			//panelInfoHash.remove(botonCoincidencias);
 			botonCoincidencias.setEnabled(false);
 			botonEnviarAnadir.setEnabled(false);//asegurar el true si hash!=""
@@ -226,26 +231,28 @@ public class VistaAnadir extends JPanel implements ActionListener{
 			
 		}else {
 			
+			System.out.println("ni hashing ni na, getphash!=null");
 			botonEnviarAnadir.setEnabled(true);
 			//estadoHashing.setText(imagenTemp.getTextoHashing());
 			panelInfoHash.setBackground(Color.GREEN);
 			
 			int cuenta = (imagenTemp.getArrayComparaciones().isEmpty()) ? 0 : imagenTemp.getArrayComparaciones().size();
+			int ms = (int)imagenTemp.getTiempoEnHashear();
 			String textoAMostrar;
 			
 			switch(cuenta) {
 			case 0:
-				textoAMostrar = "No se han encontrado imágenes similares.";
+				textoAMostrar = "No se han encontrado imágenes similares (" + ms + "ms).";
 				//panelInfoHash.remove(botonCoincidencias);
 				botonCoincidencias.setEnabled(false);
 				break;
 			case 1:
-				textoAMostrar = "Se ha encontrado 1 imagen similar";
+				textoAMostrar = "Se ha encontrado 1 imagen similar (" + ms + "ms).";
 				//panelInfoHash.add(botonCoincidencias);
 				botonCoincidencias.setEnabled(true);
 				break;
 			default:
-				textoAMostrar = "Se han encontrado " + cuenta + " imágenes similares.";
+				textoAMostrar = "Se han encontrado " + cuenta + " imágenes similares (" + ms + "ms).";
 				//panelInfoHash.add(botonCoincidencias);
 				botonCoincidencias.setEnabled(true);
 				break;
@@ -282,7 +289,8 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		panelImagen.vaciar();
 		panelImagen.repaint();
 		panelImagen.revalidate();
-		estadoHashing.setText("-");
+		estadoHashing.setText("");
+		barraNombreImagen.setText("");
 		botonCoincidencias.setEnabled(false);
 		panelEtiquetasAnadir.removeAll();
 		panelEtiquetasAnadir.repaint();

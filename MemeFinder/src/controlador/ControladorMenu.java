@@ -7,36 +7,60 @@ import javax.swing.*;
 
 import vista.*;
 
-public class ControladorMenu {
+public class ControladorMenu implements ActionListener{
 	
 	private JMenuBar menuPrincipal;
 	private VistaPrincipal vistaPrincipal;
 	
-	private JMenuItem anadirElementos;
+//	private JMenuItem anadirElementos;
+	
+	JMenu archivo;
+	JMenuItem anadirImagenes;
+	JMenuItem opciones;
 
 	public ControladorMenu(VistaPrincipal vistaPrincipal) {
 		
 		this.vistaPrincipal = vistaPrincipal;
 		this.menuPrincipal = vistaPrincipal.getMenuPrincipal();
 		
-		anadirElementos = new JMenuItem("Añadir");
-		anadirElementos.addActionListener(new ActionListener() {
+//		anadirElementos = new JMenuItem("Añadir");
+//		anadirElementos.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				vistaPrincipal.cambiaCardLayout("PANELANADIR");
+//				System.out.println("cambiado a PANELANADIR");
+//				
+//			}
+//			
+//		});
+//		
+//		menuPrincipal.add(anadirElementos);
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				vistaPrincipal.cambiaCardLayout("PANELANADIR");
-				System.out.println("cambiado a PANELANADIR");
-				
-			}
-			
-		});
+		archivo = new JMenu("Archivo");
 		
-		menuPrincipal.add(anadirElementos);
+		anadirImagenes = new JMenuItem("Añadir imágenes");
+		anadirImagenes.addActionListener(this);
+		
+		opciones = new JMenuItem("Opciones");
+		
+		archivo.add(anadirImagenes);
+		archivo.add(opciones);
+		
+		menuPrincipal.add(archivo);
+		
+		
+		
+		
+		
+	}
 
+	@Override
+	public void actionPerformed(ActionEvent ev) {
 		
-		
-		
-		
+		if(ev.getSource() == anadirImagenes) {
+			vistaPrincipal.cambiaCardLayout("PANELANADIR");//TODO popup filechooser
+		}
 		
 	}
 

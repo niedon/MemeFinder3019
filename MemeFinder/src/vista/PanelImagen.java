@@ -132,7 +132,7 @@ public class PanelImagen extends JPanel{
 	//public void cambiarImagen(File imagenMostrar, int num1, int num2) {
 	public void cambiarImagen(BufferedImage bi, int num1, int num2) {
 		
-		Image bi2 = VistaPrincipal.ponerImagen(bi, this);
+		Image bi2 = VistaPrincipal.ponerImagenEscalada(bi, this);
 		
 		imagen.setIcon(new ImageIcon(bi2));
 		

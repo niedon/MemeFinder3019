@@ -25,6 +25,7 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 	private JTextField barraEtiquetas;
 	private JTextField barraNombreImagen;
 	private JButton botonEnviar;
+	private JButton botonCancelarAnadir;
 	
 	private Hasheador hasheador;
 	private Thread thread;
@@ -46,7 +47,6 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 		this.vistaAnadir = vistaAnadir;
 		this.modeloPrincipal = modeloPrincipal;
 		
-		botonEnviar = vistaAnadir.getBotonEnviar();
 		
 		
 		//<test>
@@ -63,6 +63,8 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 		
 		botonEnviar = vistaAnadir.getBotonEnviar();
 		botonEnviar.addActionListener(this);
+		botonCancelarAnadir = vistaAnadir.getBotonCancelarAnadir();
+		botonCancelarAnadir.addActionListener(this);
 		
 		flechaIzq = vistaAnadir.getFlechaIzq();
 		flechaIzq.addMouseListener(this);
@@ -97,7 +99,7 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		
-		if(ev.getSource().equals(botonExaminar)) {
+		if(ev.getSource() == botonExaminar) {
 			
 			elegidor = new JFileChooser();
 			elegidor.setMultiSelectionEnabled(true);
@@ -168,7 +170,7 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 			}
 
 			
-		}else if(ev.getSource().equals(barraEtiquetas)) {
+		}else if(ev.getSource() == barraEtiquetas) {
 			
 			
 			//OJO a los !
@@ -187,7 +189,7 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 				
 				
 			}
-		}else if(ev.getSource().equals(botonEnviar)) {
+		}else if(ev.getSource() == botonEnviar) {
 			
 			//En cristiano, si el nombre (sin extensión) del objeto ImageTemp es DISTINTO al string de la barra Y el string de la barra NO es ""
 			if(!arrayListImagenes.get(contadorImagenActual).getNombre().equals(barraNombreImagen.getText()) && !barraNombreImagen.getText().equals("")) {
@@ -226,11 +228,23 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 			}
 			
 
+		}else if(ev.getSource() == botonCancelarAnadir) {
+			
+			//TODO esto es básicamente copypaste del código del final de ev==botonEnviar, modularizar si procede
+			arrayListImagenes.remove(contadorImagenActual);
+			if(arrayListImagenes.isEmpty()) {
+				vistaAnadir.vaciar();
+			}else {
+				if(contadorImagenActual == arrayListImagenes.size()) contadorImagenActual--;
+				vistaAnadir.setNuevaImagen(arrayListImagenes.get(contadorImagenActual), contadorImagenActual+1, arrayListImagenes.size());
+			}
+			
+			
 		}
 		
 		
 		
-		if(ev.getSource().getClass().getSimpleName().equals("Etiquetas")) {
+		if(ev.getSource() instanceof Etiquetas) {
 			
 			vistaAnadir.quitarEtiqueta((Etiquetas)ev.getSource());
 			arrayListImagenes.get(contadorImagenActual).getArrayEtiquetas().remove(ev.getSource());
@@ -263,26 +277,15 @@ public class ControladorAnadir implements ActionListener, MouseListener{
 	@Override
 	public void mouseEntered(MouseEvent ev) {
 		//TODO aquí y en el siguiente virguerías gráficas de opacidad de las flechas
-		
-		
 	}
 
 	@Override
-	public void mouseExited(MouseEvent ev) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseExited(MouseEvent ev) {}
 
 	@Override
-	public void mousePressed(MouseEvent ev) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mousePressed(MouseEvent ev) {}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseReleased(MouseEvent arg0) {}
 
 }

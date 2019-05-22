@@ -29,6 +29,7 @@ import controlador.ImagenTemp;
 public class VistaResultados extends JPanel implements KeyListener, MouseListener, ChangeListener{
 	
 	private ImagenTemp[] res;
+	private ImagenTemp imagenTempSeleccionada;
 	
 	private JPanel resultadosOeste;
 	
@@ -89,10 +90,13 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	private JPanel panelImagenEtiquetas;
 	
 	private JPanel panelImagenBotones;
+	private JButton botonBorrarImagen;
 	
 	
 	
 	public VistaResultados() {
+		
+		imagenTempSeleccionada = null;
 		
 		this.setLayout(new BorderLayout(5,5));
 		
@@ -105,7 +109,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		//-----------BARRA BÚSQUEDA Y BUSCAR
 		panelBarra = new JPanel();
 		panelBarra.setMaximumSize(new Dimension((int)panelBarra.getMaximumSize().getWidth(), (int)panelBarra.getMinimumSize().getHeight()));
-		panelBarra.setBackground(Color.BLUE);
+		//panelBarra.setBackground(Color.BLUE);
 		
 		barraBusqueda = new JTextField(15);
 		barraBusqueda.addKeyListener(this);
@@ -118,7 +122,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		
 		panelOpcionesBuscar = new JPanel();
 		panelOpcionesBuscar.setLayout(new BoxLayout(panelOpcionesBuscar,BoxLayout.Y_AXIS));
-		panelOpcionesBuscar.setBackground(Color.RED);
+		//panelOpcionesBuscar.setBackground(Color.RED);
 		panelOpcionesBuscar.setMaximumSize(new Dimension((int)resultadosOeste.getPreferredSize().getWidth(),(int)panelOpcionesBuscar.getMinimumSize().getHeight()));
 		
 		panelBuscarSinEtiqueta = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -248,7 +252,8 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		panelImagenEtiquetas.setPreferredSize(new Dimension(500,150));
 		
 		panelImagenBotones = new JPanel();
-		panelImagenBotones.add(new JButton("TEST BOTONES SUR"));
+		botonBorrarImagen = new JButton("Borrar imagen");
+		panelImagenBotones.add(botonBorrarImagen);
 		
 		
 		
@@ -352,6 +357,10 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		return opAnoAntes;
 	}
 	
+	public JButton getBotonBorrarImagen() {
+		return botonBorrarImagen;
+	}
+	
 	public int getNumeroFilas() {
 		return ((GridLayout)resultadosGrid.getLayout()).getRows();
 	}
@@ -374,6 +383,10 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 				+ "/"
 				+ (String)opAnoAntes.getSelectedItem();
 		
+	}
+	
+	public ImagenTemp getImagenTempSeleccionado() {
+		return imagenTempSeleccionada;
 	}
 
 //	public ArrayList<ImagenTemp> getArrayResultados() {
@@ -416,7 +429,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	
 	private void cambiarImagenGrande(ImagenTemp it) {
 		
-		Image imgtemp = VistaPrincipal.ponerImagen(it.getbImagen(), panelImagenGrande);
+		Image imgtemp = VistaPrincipal.ponerImagenEscalada(it.getbImagen(), panelImagenGrande);
 		labelImagenGrande.setIcon(new ImageIcon(imgtemp));
 		labelImagenGrande.setBounds((int)(((float)panelImagenGrande.getWidth()/2) - ((float)imgtemp.getWidth(null))/((float)2)), (int)(((float)panelImagenGrande.getHeight()/2) - ((float)imgtemp.getHeight(null))/((float)2)),imgtemp.getWidth(null), imgtemp.getHeight(null));
 		
@@ -439,6 +452,18 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 			panelImagenEtiquetas.add(e);
 		}
 		
+		resultadosEste.revalidate();
+		resultadosEste.repaint();
+		
+	}
+	
+	public void vaciarImagenGrande() {
+		labelImagenGrande.setIcon(null);
+		labelNombre.setText("");
+		labelFecha.setText("");
+		labelResolucion.setText("");
+		labelPeso.setText("");
+		panelImagenEtiquetas.removeAll();
 		resultadosEste.revalidate();
 		resultadosEste.repaint();
 		
@@ -486,45 +511,27 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	public void mouseClicked(MouseEvent ev) {
 		//System.out.println("reclic");
 		//System.out.println(ev.getSource().getClass().getSimpleName());
-		if(ev.getSource().getClass().getSimpleName().equals((new PanelImagenRes()).getClass().getSimpleName())) {
-			//System.out.println("clic");
+		
+//		if(ev.getSource().getClass().getSimpleName().equals((new PanelImagenRes()).getClass().getSimpleName())) {
+//			//System.out.println("clic");
+//			cambiarImagenGrande(((PanelImagenRes)ev.getSource()).getImagenTemp());
+//		}
+		
+		
+		if(ev.getSource() instanceof PanelImagenRes) {
 			cambiarImagenGrande(((PanelImagenRes)ev.getSource()).getImagenTemp());
-			
+			imagenTempSeleccionada = ((PanelImagenRes)ev.getSource()).getImagenTemp();
 		}
 		
 	}
-
-
-
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
+	public void mouseEntered(MouseEvent arg0) {}
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
+	public void mouseExited(MouseEvent arg0) {}
 	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
+	public void mousePressed(MouseEvent arg0) {}
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseReleased(MouseEvent arg0) {}
 
 
 

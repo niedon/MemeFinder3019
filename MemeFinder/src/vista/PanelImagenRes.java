@@ -127,7 +127,7 @@ public class PanelImagenRes extends JPanel implements ComponentListener, MouseLi
 		//panelLateral.setSize(new Dimension(panelLateral.getHeight(),panelLateral.getHeight()));
 		
 		
-		Image imgOriginal = VistaPrincipal.ponerImagen(itemp.getbImagen(), panelLateral);
+		Image imgOriginal = VistaPrincipal.ponerImagenEscalada(itemp.getbImagen(), panelLateral);
 		labelImagen.setIcon(new ImageIcon(imgOriginal));
 		labelImagen.setBounds((int)(((float)panelLateral.getWidth()/2) - ((float)imgOriginal.getWidth(null))/((float)2)), (int)(((float)panelLateral.getHeight()/2) - ((float)imgOriginal.getHeight(null))/((float)2)),imgOriginal.getWidth(null), imgOriginal.getHeight(null));
 		labelNombre.setText(itemp.getNombre()+itemp.getExtension());
@@ -180,7 +180,7 @@ public class PanelImagenRes extends JPanel implements ComponentListener, MouseLi
 	@Override
 	public void componentResized(ComponentEvent arg0) {
 		System.out.println("sizeado " + itemp.getNombre());
-		labelImagen.setIcon(new ImageIcon(VistaPrincipal.ponerImagen(itemp.getbImagen(), panelLateral)));
+		labelImagen.setIcon(new ImageIcon(VistaPrincipal.ponerImagenEscalada(itemp.getbImagen(), panelLateral)));
 		
 		
 	}

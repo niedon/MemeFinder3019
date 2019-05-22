@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import modelo.ModeloPrincipal;
 import vista.Etiquetas;
@@ -53,6 +54,9 @@ public class ControladorResultados implements ActionListener {
 		}
 		vistaResultados.getOpAnoDespues().setSelectedIndex(vistaResultados.getOpAnoAntes().getItemCount()-1);
 		vistaResultados.getOpAnoAntes().setSelectedIndex(0);
+		
+		
+		vistaResultados.getBotonBorrarImagen().addActionListener(this);
 		
 		
 	}
@@ -214,6 +218,38 @@ public class ControladorResultados implements ActionListener {
 			mostrarResultados();
 //			if(!anterior.isEnabled()) anterior.setEnabled(true);
 //			if(numPagina == numTotalPaginas-1) siguiente.setEnabled(false);
+			
+			
+			
+		}else if(ev.getSource()==vistaResultados.getBotonBorrarImagen()) {	
+			
+			if(JOptionPane.showConfirmDialog(null, "¿Borrar la imgen? (Este proceso no puede revertirse)")==JOptionPane.YES_OPTION) {
+				ImagenTemp t = vistaResultados.getImagenTempSeleccionado();
+				if(t==null) {
+					System.out.println("-------------EXCEPCIÓN RARUNA EN ControladorResultados ev.getsource==botonborrarimagen");
+				}else {
+					/*
+						TODO
+						-borrar imagen de tablaimagenes
+						-descontar (y borrar si procede) etiqueta de tablaetiquetas
+						-borrar del array de resultados, cargar imagen siquiente o anterior si es la última
+					*/
+					
+					arrayResultados.remove(t);
+					mostrarResultados();
+					vistaResultados.vaciarImagenGrande();
+					
+					modeloPrincipal.borrarImagen(t.getIdMongo());//TODO refrescar cuenta de las demás etiquetas presentes?
+				}
+				
+			}
+			
+			
+			
+			
+			
+			
+			
 			
 		//}else if(ev.getSource().getClass().getSimpleName().equals("Etiquetas")) {
 		}else if(ev.getSource() instanceof Etiquetas) {

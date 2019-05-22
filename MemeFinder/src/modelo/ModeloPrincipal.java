@@ -110,7 +110,8 @@ public class ModeloPrincipal {
 		 entrada.append(ETIQUETAS, Arrays.asList(imagenTemp.etiquetasAArrayDeString()));//TODO comprobar si hay error si etiquetas==null
 		 //entrada.append(URL, temp.getAbsolutePath().substring(temp.getAbsolutePath().lastIndexOf('/')+1));
 		 entrada.append(URL, temp.getAbsolutePath());
-		 entrada.append(PHASH, imagenTemp.getPHash());
+		 //List<Boolean> hash = Arrays.asList(imagenTemp.getPHashWrap());
+		 entrada.append(PHASH, Arrays.asList(imagenTemp.getPHash()));
 		 entrada.append(FECHA, imagenTemp.getFecha());
 		 
 		 tablaImagenes.insertOne(entrada);
@@ -123,7 +124,7 @@ public class ModeloPrincipal {
 			 
 			 //Si no existe esa etiqueta en BD
 			 if(tablaEtiquetas.find(new Document(_ID,e.getTexto())).first() == null) {
-				 System.out.println("etiquetas null");
+//				 System.out.println("etiquetas null");
 			 //if(tablaEtiquetas.countDocuments(new Document(_ID,e.getTexto())) == 0) {
 				 
 				 Document doc = new Document();
@@ -132,7 +133,7 @@ public class ModeloPrincipal {
 				 
 				 tablaEtiquetas.insertOne(doc);
 				 
-				 System.out.println("count0: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+//				 System.out.println("count0: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
 				 
 			 }else {
 				 System.out.println("etiquetas no null");
@@ -141,7 +142,7 @@ public class ModeloPrincipal {
 								
 						tablaEtiquetas.updateOne(new Document().append(_ID, e.getTexto()), newDocument);
 						
-						System.out.println("count+: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+//						System.out.println("count+: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
 				 
 			 }
 			 
@@ -152,6 +153,34 @@ public class ModeloPrincipal {
 		 
 		 
 		 return false;
+	 }
+	 
+	 public boolean borrarImagen(ObjectId id) {
+		 
+		 try {
+			 
+			 Document doc = (Document)tablaImagenes.find(new Document(_ID,id)).first();
+			 
+			 for(String s : (ArrayList<String>) doc.get(ETIQUETAS)) {
+				 
+				 if(getCountEtiquetas(s) == 1) {
+					 tablaEtiquetas.deleteOne(eq(_ID,s));
+				 }else {
+					 tablaEtiquetas.updateOne(eq(_ID,s),Updates.inc(ETCOUNT, -1));
+				 }
+	 
+			 }
+			 
+			 tablaImagenes.deleteOne(new Document(_ID,id));
+			 
+			 return true;
+			 
+		 }catch(Exception e) {
+			 System.out.println("----------------EXCEPCIÓN BORRANDO UNA IMAGEN ModeloPricipal borrarImagen()");
+			 return false;
+		 }
+		 
+		 
 	 }
 	 
 	 public int getCountEtiquetas(String str) {
@@ -169,22 +198,43 @@ public class ModeloPrincipal {
 	 }
 	 
 	 
-	 //TODO método para comparar imágenes almacenadas, quizás devolver string[] o imagentemp[] para procesar en vistacoincidencias
-	 
-	 public ArrayList<ImagenTemp> getArrayComparaciones(ImagenTemp it, int max) {
+	 public ArrayList<ImagenTemp> getArrayComparaciones(ImagenTemp it, int minPorcentaje) {
 		 
 		 ArrayList<ImagenTemp> arrayRetorna = new ArrayList<ImagenTemp>();
-		 String hashOriginal = it.getPHash();
+		 //String hashOriginal = it.getPHash();
+		 Boolean[] hashOriginal = it.getPHash();
+		 
+//		 System.out.println();
+//		 System.out.println("hash original:  ");
+//		 for(int i=0; i<hashOriginal.length; i++) {
+//			 System.out.print(hashOriginal[i] + "-");
+//		 }
+//		 System.out.println();
+		 
 		 FindIterable<Document> iterable = tablaImagenes.find();
-		 System.out.println(iterable.toString());
+//		 System.out.println("iterable: " + iterable.toString());
 		 FindIterable<BasicDBObject> caca = tablaImagenes.find();
 		 
 		 for(Document doc : iterable) {
-			 System.out.println("comprado con: " + ((String)doc.get(NOMBRE)));
-			 int compara = ProxyHash.getDistancia((String)doc.get(PHASH), hashOriginal);
-			 System.out.println("compara: " + compara);
-			 if(compara < max) {
+			 
+			 ArrayList<Boolean> arb = (ArrayList<Boolean>)doc.get(PHASH);
+			 Boolean[] hashMeCagoEnLaHostia = new Boolean[arb.size()];
+			 for(int i=0; i<arb.size(); i++) {
 				 
+				 hashMeCagoEnLaHostia[i] = arb.get(i);
+				 
+			 }
+			 
+//			 System.out.println("comprado con: " + ((String)doc.get(NOMBRE)));
+			 //int compara = ProxyHash.getDistancia((Boolean[])(((ArrayList<Boolean>)doc.get(PHASH)).toArray()), hashOriginal);
+//			 int compara = ProxyHash.getDistancia(
+//					 (Boolean[])(doc.getList(PHASH,
+//					 Boolean.class).toArray()), hashOriginal);
+			 //investiga(doc.get(PHASH));
+			 float compara = ProxyHash.getDistancia(hashMeCagoEnLaHostia,
+					 hashOriginal);
+//			 System.out.println("compara: " + compara);
+			 if(compara > (((float)minPorcentaje)/((float)100))) {
 				 ImagenTemp temp = convierteDocObjeto(doc);
 				 temp.setIndiceParecido(compara);
 				 arrayRetorna.add(temp);
@@ -195,9 +245,6 @@ public class ModeloPrincipal {
 		 
 	 }
 	 
-//	 public ArrayList<ImagenTemp> getArrayResultados(ArrayList<Etiquetas> arrayEtiquetas){
-//		 return getArrayResultados(arrayEtiquetas, null, null);
-//	 }
 	 
 	 public ArrayList<ImagenTemp> getArrayResultados(ArrayList<Etiquetas> arrayEtiquetas, Long despuesDe, Long antesDe){
 		 
@@ -266,84 +313,6 @@ public class ModeloPrincipal {
 		 
 		 return retorna;
 		 
-//		 System.out.println("ejecuta");
-////		 Document doc = new Document();
-////		 
-////		 if(arrayEtiquetas==null) {
-////			 doc.append(ETIQUETAS, new ArrayList<String>());
-////		 }else {
-////			 
-////			 ArrayList<String> etiquetasNoCero = new ArrayList<String>();
-////			 for(Etiquetas e : arrayEtiquetas) {
-////				 if(getCountEtiquetas(e.getTexto()) != 0) {
-////					 etiquetasNoCero.add(e.getTexto());
-////				 }
-////				 doc.append(ETIQUETAS, new Document("$all", etiquetasNoCero));
-////			 
-////			 }
-////			 
-////		 }
-//		 
-//		 //Document ttttt = (Document) tablaEtiquetas.find(eq("address.city", "Wimborne")).first();
-//		 
-//		 
-//		 
-//		 
-//		 
-//		 
-//		 if(arrayEtiquetas != null) {
-//			 
-//			 //Document doc = new Document();
-//			 
-//			 //Añade a etiquetasNoCero los textos de etiquetas que tienen resultados en la bd
-//			 ArrayList<String> etiquetasNoCero = new ArrayList<String>();		 
-//			 for(Etiquetas e : arrayEtiquetas) {
-//				 if(getCountEtiquetas(e.getTexto()) != 0) {
-//					 etiquetasNoCero.add(e.getTexto());
-//				 }
-//			 }
-//			 
-////			 //<test>
-////			 System.out.print("etiquetas nonull: ");
-////			 for(String s : etiquetasNoCero) { System.out.print(s + "-"); }
-////			 System.out.println();
-////			 //</test>
-//			 
-//			 //doc.append(ETIQUETAS, new Document("$all", etiquetasNoCero));
-//			 
-//			 
-//			 
-//			 
-//			 //FindIterable<Document> resultado = tablaImagenes.find(doc);
-//			 FindIterable<Document> resultado = tablaImagenes.find(all(ETIQUETAS,etiquetasNoCero));
-//			 MongoCursor<Document> iter = resultado.iterator();
-//			 
-//			 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
-//			 
-//			 //Parseador
-//			 while(iter.hasNext()) {
-//				 
-//				 retorna.add(convierteDocObjeto(iter.next()));
-//			 }
-//			 
-//			 return retorna;
-//			 
-//		 }else {
-//			 
-//			 //Document doc = new Document(ETIQUETAS, new ArrayList<String>());
-//			 FindIterable<Document> resultado = tablaImagenes.find(new Document(ETIQUETAS, new ArrayList<String>()));
-//			 MongoCursor<Document> iter = resultado.iterator();
-//			 
-//			 ArrayList<ImagenTemp> retorna = new ArrayList<ImagenTemp>();
-//			 
-//			 while(iter.hasNext()) {
-//				 retorna.add(convierteDocObjeto(iter.next()));
-//			 }
-//			 
-//			 return retorna;
-//			 
-//		 }
-		 
 	 }
 	 
 	 
@@ -359,7 +328,22 @@ public class ModeloPrincipal {
 //		 for(String s : (String[]) d.get(ETIQUETAS)) {
 //			 etiquetas.add(new Etiquetas(s,getCountEtiquetas(s)));
 //		 }
-		 String pHash = (String) d.get(PHASH);
+		 //String pHash = (String) d.get(PHASH);
+		 
+//		 Boolean[] pHash = (Boolean[])d.get(PHASH);
+		 
+//		 ArrayList<Boolean> arb = (ArrayList<Boolean>)doc.get(PHASH);
+//		 Boolean[] hashMeCagoEnLaHostia = new Boolean[arb.size()];
+//		 for(int i=0; i<arb.size(); i++) {
+//			 
+//			 hashMeCagoEnLaHostia[i] = arb.get(i);
+//			 
+//		 }
+		 ArrayList<Boolean> boolTemporal = (ArrayList<Boolean>) d.get(PHASH);
+		 Boolean[] pHash = new Boolean[boolTemporal.size()];
+		 for(int i=0; i<boolTemporal.size(); i++) pHash[i] = boolTemporal.get(i);
+		 
+		 
 		 long fecha = (long) d.get(FECHA);
 		 
 		 ImagenTemp retorna = new ImagenTemp(url,nombreFull);

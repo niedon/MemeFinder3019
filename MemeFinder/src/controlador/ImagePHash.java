@@ -28,18 +28,40 @@ public class ImagePHash {
 		initCoefficients();
 	}
 	
-	public int distance(String s1, String s2) {
+//	public int distance(String s1, String s2) {
+//		int counter = 0;
+//		for (int k = 0; k < s1.length();k++) {
+//			if(s1.charAt(k) != s2.charAt(k)) {
+//				counter++;
+//			}
+//		}
+//		return counter;
+//	}
+	
+	private int distance(Boolean[] s1, Boolean[] s2) {
 		int counter = 0;
-		for (int k = 0; k < s1.length();k++) {
-			if(s1.charAt(k) != s2.charAt(k)) {
+		for (int k = 0; k < s1.length; k++) {
+			if(s1[k]==s2[k]) {
 				counter++;
 			}
 		}
 		return counter;
 	}
 	
+	public float distanceFraction(Boolean[] s1, Boolean[] s2) {
+		
+		if(s1.length != s2.length) System.out.println("------------ERROR, LAS LONGITUDES DE LOS HASH NO COINCIDEN EN ImagePHash distanceFraction()");
+		
+		int numerador = distance(s1, s2);
+		System.out.println(numerador);
+		return ((float)numerador)/((float)s1.length);
+		
+		
+	}
+	
 	// Returns a 'binary string' (like. 001010111011100010) which is easy to do a hamming distance on. 
-	public String getHash(InputStream is) throws Exception {
+	//public String getHash(InputStream is) throws Exception {
+	public Boolean[] getHash(InputStream is) throws Exception {
 		BufferedImage img = ImageIO.read(is);
 		
 		/* 1. Reduce size. 
@@ -105,12 +127,20 @@ public class ImagePHash {
 		 * remains the same; this can survive gamma and color histogram 
 		 * adjustments without a problem.
 		 */
-		String hash = "";
+		//String hash = "";
+		Boolean[] hash;
+		if (smallerSize != 0) hash = new Boolean[smallerSize*smallerSize - ((smallerSize*2)-1)];
+		else hash = new Boolean[0];
+		int casillita = 0;
 		
 		for (int x = 0; x < smallerSize; x++) {
 			for (int y = 0; y < smallerSize; y++) {
 				if (x != 0 && y != 0) {
-					hash += (dctVals[x][y] > avg?"1":"0");
+					
+					hash[casillita] = (dctVals[x][y] > avg ? true : false);
+					casillita++;
+					
+					
 				}
 			}
 		}
@@ -118,7 +148,7 @@ public class ImagePHash {
 		return hash;
 	}
 	
-	private BufferedImage resize(BufferedImage image, int width,	int height) {
+	private BufferedImage resize(BufferedImage image, int width, int height) {
 		BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = resizedImage.createGraphics();
 		g.drawImage(image, 0, 0, width, height, null);

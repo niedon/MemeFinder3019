@@ -23,14 +23,16 @@ public class ImagenTemp {
 	private ArrayList<Etiquetas> arrayEtiquetas;
 	private String nombre;
 	private String extension;
-	private String pHash;
+	//private String pHash;
+	private Boolean[] pHash;
 	private long fecha;
 	
 	private String textoTempDelHash;
-	private int indiceParecido;
+	private float indiceParecido;
 	private ArrayList<ImagenTemp> arrayComparaciones;
+	private long tiempoEnHashear;
 	
-
+	
 	public ImagenTemp(String url, String nombreYExtension) {
 		
 		this.imagen = new File(url);
@@ -41,8 +43,8 @@ public class ImagenTemp {
 			e.printStackTrace();
 		}
 		this.arrayEtiquetas = new ArrayList<Etiquetas>();
-		//this.pHash = ProxyHash.getHash(imagen);//TODO meter threads
-		this.pHash = "";
+		//this.pHash = "";
+		this.pHash = null;
 		this.nombre = nombreYExtension.substring(0,nombreYExtension.lastIndexOf('.'));
 		this.extension = nombreYExtension.substring(nombreYExtension.lastIndexOf('.'));
 		this.fecha = System.currentTimeMillis();
@@ -97,13 +99,25 @@ public class ImagenTemp {
 		return arrayEtiquetas;
 	}
 	
-	public String getPHash() {
+	public Boolean[] getPHash() {
 		return pHash;
 	}
 	
-	public void setPHash(String pHash) {
+//	public Boolean[] getPHashWrap() {
+//		Boolean[] retorna = new Boolean[pHash.length];
+//		for(int i=0; i<retorna.length; i++) {
+//			retorna[i] = pHash[i];
+//		}
+//		return retorna;
+//	}
+	
+	public void setPHash(Boolean[] pHash) {
 		this.pHash = pHash;
 		//textoTempDelHash = "Hashing completito, shurmanus";
+//		for(Boolean b : pHash) {
+//			System.out.print(b + "-");
+//		}
+		
 	}
 	
 	public String getNombre() {
@@ -140,11 +154,11 @@ public class ImagenTemp {
 		return textoTempDelHash;
 	}
 	
-	public int getIndiceParecido() {
+	public float getIndiceParecido() {
 		return this.indiceParecido;
 	}
 	
-	public void setIndiceParecido(int indiceParecido) {
+	public void setIndiceParecido(float indiceParecido) {
 		this.indiceParecido = indiceParecido;
 	}
 	
@@ -154,6 +168,14 @@ public class ImagenTemp {
 
 	public void setArrayComparaciones(ArrayList<ImagenTemp> arrayComparaciones) {
 		this.arrayComparaciones = arrayComparaciones;
+	}
+	
+	public long getTiempoEnHashear() {
+		return tiempoEnHashear;
+	}
+
+	public void setTiempoEnHashear(long tiempoEnHashear) {
+		this.tiempoEnHashear = tiempoEnHashear;
 	}
 	
 	

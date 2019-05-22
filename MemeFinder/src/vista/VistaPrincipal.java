@@ -52,6 +52,8 @@ public class VistaPrincipal extends JFrame{
 		panelGeneral = new JPanel(new BorderLayout());
 		
 		panelPrincipal = new JPanel();
+		//TODO llevar cardlayout a controlador
+		//TODO definir nombres de paneles por variables estáticas final
 		cardLayoutPrincipal = new CardLayout();
 		panelPrincipal.setLayout(cardLayoutPrincipal);
 		
@@ -241,7 +243,7 @@ public class VistaPrincipal extends JFrame{
 		
 	}
 	
-	protected static Image ponerImagen(BufferedImage imagen, Container contenedor) {
+	protected static Image ponerImagenEscalada(BufferedImage imagen, Container contenedor) {
 		
 		//Ojo a los !!
 		//Si la imagen no es mayor que el contenedor, ni en alto ni en ancho

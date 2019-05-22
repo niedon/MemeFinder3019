@@ -225,7 +225,7 @@ public class VistaCoincidencias extends JPanel implements ActionListener{
 		indiceActual = 0;
 		
 		//Imagen "fija" de la izquierda
-		Image imgOriginal = VistaPrincipal.ponerImagen(imagenTemp.getbImagen(), panelIzqImagen);
+		Image imgOriginal = VistaPrincipal.ponerImagenEscalada(imagenTemp.getbImagen(), panelIzqImagen);
 		imagenOriginal.setText("");
 		imagenOriginal.setIcon(new ImageIcon(imgOriginal));
 		imagenOriginal.setBounds((int)(((float)panelIzqImagen.getWidth()/2) - ((float)imgOriginal.getWidth(null))/((float)2)), (int)(((float)panelIzqImagen.getHeight()/2) - ((float)imgOriginal.getHeight(null))/((float)2)),imgOriginal.getWidth(null), imgOriginal.getHeight(null));
@@ -240,6 +240,7 @@ public class VistaCoincidencias extends JPanel implements ActionListener{
 		
 		botonAnterior.setEnabled(false);
 		if(imagenTemp.getArrayComparaciones().size()==1) botonSiguiente.setEnabled(false);
+		else botonSiguiente.setEnabled(true);
 		
 	}
 	
@@ -249,7 +250,7 @@ public class VistaCoincidencias extends JPanel implements ActionListener{
 		if(indice>=imagenTemp.getArrayComparaciones().size()) System.out.println("Error en VistaCoincidencias.cambiarImagenSec (indice fuera de tamaño de arraylist)");
 		
 		//Imagen a cambiar en la derecha
-		Image imgSecundaria = VistaPrincipal.ponerImagen(imagenTemp.getArrayComparaciones().get(indice).getbImagen(), panelDerImagen);
+		Image imgSecundaria = VistaPrincipal.ponerImagenEscalada(imagenTemp.getArrayComparaciones().get(indice).getbImagen(), panelDerImagen);
 		imagenSimilar.setText("");
 		imagenSimilar.setIcon(new ImageIcon(imgSecundaria));
 		imagenSimilar.setBounds((int)(((float)panelDerImagen.getWidth()/2) - ((float)imgSecundaria.getWidth(null))/((float)2)), (int)(((float)panelDerImagen.getHeight()/2) - ((float)imgSecundaria.getHeight(null))/((float)2)),imgSecundaria.getWidth(null), imgSecundaria.getHeight(null));
@@ -264,7 +265,9 @@ public class VistaCoincidencias extends JPanel implements ActionListener{
 		etiquetaCantidad.setText((indice+1) + "/" + imagenTemp.getArrayComparaciones().size());
 		
 		//Datos secundarios (ojo, están en el panel de la izquierda)
-		porcentajeOriginal.setText((100-imagenTemp.getArrayComparaciones().get(indice).getIndiceParecido()) + "% de similitud");
+		//porcentajeOriginal.setText((100-imagenTemp.getArrayComparaciones().get(indice).getIndiceParecido()) + "% de similitud");
+		//porcentajeOriginal.setText((100*imagenTemp.getArrayComparaciones().get(indice).getIndiceParecido()) + "% de similitud (multiplíquese por 100)");
+		porcentajeOriginal.setText(String.format("%.02f%% similares.", 100*imagenTemp.getArrayComparaciones().get(indice).getIndiceParecido()));
 		tiempoAnadidaOriginal.setText(imagenTemp.getArrayComparaciones().get(indice).getFecha()+"");//TODO poner en formato "hace X días/meses/..."
 		
 		this.revalidate();
