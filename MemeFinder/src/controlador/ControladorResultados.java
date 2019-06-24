@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import org.bson.types.ObjectId;
+
 import modelo.ModeloPrincipal;
 import vista.Etiquetas;
 import vista.VistaResultados;
@@ -24,6 +26,8 @@ public class ControladorResultados implements ActionListener {
 	private ArrayList<ImagenTemp> arrayResultados;
 	private Long fechaDespuesDe, fechaAntesDe;
 	
+	private JButton botonBuscar;
+	
 	private int numPagina, numTotalPaginas;
 	
 	private JButton anterior, siguiente;
@@ -36,7 +40,8 @@ public class ControladorResultados implements ActionListener {
 		
 		arrayEtiquetasBusqueda = new ArrayList<Etiquetas>();
 		
-		vistaResultados.getBotonBuscar().addActionListener(this);
+		botonBuscar = vistaResultados.getBotonBuscar(); 
+		botonBuscar.addActionListener(this);
 		vistaResultados.getOpBuscarSinEtiqueta().addActionListener(this);
 		
 		anterior = vistaResultados.getAnterior();
@@ -56,14 +61,37 @@ public class ControladorResultados implements ActionListener {
 		vistaResultados.getOpAnoAntes().setSelectedIndex(0);
 		
 		
-		vistaResultados.getBotonBorrarImagen().addActionListener(this);
+	}
+	
+	public JButton getBotonBuscar() {
+		return botonBuscar;
+	}
+	
+	//public boolean busquedaConEtiquetasSeleccionada() { return !vistaResultados.getOpBuscarSinEtiqueta().isSelected(); }
+	
+	public void busqueda2(ObjectId idMongo) {
+		//controladorResultados.empezarBusqueda(controladorResultados.busquedaConEtiquetasSeleccionada());
+		empezarBusqueda(!vistaResultados.getOpBuscarSinEtiqueta().isSelected());
+		
+		int numeroContiene = -1;
+		
+		for(int i=0; i<vistaResultados.getArrayResultadosActuales().length; i++) {
+			if(vistaResultados.getArrayResultadosActuales()[i].getIdMongo().equals(idMongo)) {
+				numeroContiene=i;
+				break;
+			}
+		}
+		
+		if(numeroContiene == -1) {
+			vistaResultados.vaciarImagenGrande();
+		}else {
+			vistaResultados.cambiarImagenGrande(vistaResultados.getArrayResultadosActuales()[numeroContiene]);
+		}
 		
 		
 	}
 	
-	
-	
-	private void empezarBusqueda(boolean buscarConEtiquetas) {//TODO sincronizar y hacer a thread de búsqueda acceder aquí?
+	public void empezarBusqueda(boolean buscarConEtiquetas) {//TODO sincronizar y hacer a thread de búsqueda acceder aquí?
 		
 		System.out.println("buscar, etiquetas: " + buscarConEtiquetas);
 		
@@ -137,7 +165,7 @@ public class ControladorResultados implements ActionListener {
 //			}
 //			
 //		}else if(ev.getSource()==vistaResultados.getBotonBuscar()) {
-		if(ev.getSource()==vistaResultados.getBotonBuscar()) {
+		if(ev.getSource()==botonBuscar) {
 			
 //			System.out.println(vistaResultados.getFechaAntes());
 //			System.out.println(vistaResultados.getFechaDespues());
@@ -220,38 +248,6 @@ public class ControladorResultados implements ActionListener {
 //			if(numPagina == numTotalPaginas-1) siguiente.setEnabled(false);
 			
 			
-			
-		}else if(ev.getSource()==vistaResultados.getBotonBorrarImagen()) {	
-			
-			if(JOptionPane.showConfirmDialog(null, "¿Borrar la imgen? (Este proceso no puede revertirse)")==JOptionPane.YES_OPTION) {
-				ImagenTemp t = vistaResultados.getImagenTempSeleccionado();
-				if(t==null) {
-					System.out.println("-------------EXCEPCIÓN RARUNA EN ControladorResultados ev.getsource==botonborrarimagen");
-				}else {
-					/*
-						TODO
-						-borrar imagen de tablaimagenes
-						-descontar (y borrar si procede) etiqueta de tablaetiquetas
-						-borrar del array de resultados, cargar imagen siquiente o anterior si es la última
-					*/
-					
-					arrayResultados.remove(t);
-					mostrarResultados();
-					vistaResultados.vaciarImagenGrande();
-					
-					modeloPrincipal.borrarImagen(t.getIdMongo());//TODO refrescar cuenta de las demás etiquetas presentes?
-				}
-				
-			}
-			
-			
-			
-			
-			
-			
-			
-			
-		//}else if(ev.getSource().getClass().getSimpleName().equals("Etiquetas")) {
 		}else if(ev.getSource() instanceof Etiquetas) {
 			
 			if(arrayEtiquetasBusqueda.contains(ev.getSource())) {

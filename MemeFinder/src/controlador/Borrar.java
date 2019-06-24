@@ -42,7 +42,9 @@ public class Borrar {
 	 
 	 
 	 
+	 -----------------otros
 	 
+	 opciones: ordenar etiquetas alfabéticamente, por número (asc-desc) o por orden de introducción, cambiar en modelo (o por parámetro al modelo)
 	 
 	 
 	 

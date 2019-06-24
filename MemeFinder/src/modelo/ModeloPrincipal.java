@@ -21,6 +21,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
+
 import static com.mongodb.client.model.Filters.*;
 
 import controlador.ImagenTemp;
@@ -68,7 +70,6 @@ public class ModeloPrincipal {
 //			DBCursor cur = tablaImagenes.find();
 			
 			//Document document = new Document();
-			
 			
 			
 			
@@ -120,31 +121,34 @@ public class ModeloPrincipal {
 		 
 		 //Modifica tablaEtiquetas
 		 
+		 //TODO comprobar que no falla si getArrayEtiquetas().isEmpty()
 		 for(Etiquetas e : imagenTemp.getArrayEtiquetas()) {
 			 
-			 //Si no existe esa etiqueta en BD
-			 if(tablaEtiquetas.find(new Document(_ID,e.getTexto())).first() == null) {
-//				 System.out.println("etiquetas null");
-			 //if(tablaEtiquetas.countDocuments(new Document(_ID,e.getTexto())) == 0) {
-				 
-				 Document doc = new Document();
-				 doc.append(_ID, e.getTexto());
-				 doc.append(ETCOUNT, 1);
-				 
-				 tablaEtiquetas.insertOne(doc);
-				 
-//				 System.out.println("count0: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
-				 
-			 }else {
-				 System.out.println("etiquetas no null");
-				 Document newDocument = new Document();
-				 newDocument.append("$inc", new BasicDBObject().append(ETCOUNT, 1));
-								
-						tablaEtiquetas.updateOne(new Document().append(_ID, e.getTexto()), newDocument);
-						
-//						System.out.println("count+: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
-				 
-			 }
+			 anadirEtiqueta(e.getTexto());
+			 
+//			 //Si no existe esa etiqueta en BD
+//			 if(tablaEtiquetas.find(new Document(_ID,e.getTexto())).first() == null) {
+////				 System.out.println("etiquetas null");
+//			 //if(tablaEtiquetas.countDocuments(new Document(_ID,e.getTexto())) == 0) {
+//				 
+//				 Document doc = new Document();
+//				 doc.append(_ID, e.getTexto());
+//				 doc.append(ETCOUNT, 1);
+//				 
+//				 tablaEtiquetas.insertOne(doc);
+//				 
+////				 System.out.println("count0: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+//				 
+//			 }else {
+//				 System.out.println("etiquetas no null");
+//				 Document newDocument = new Document();
+//				 newDocument.append("$inc", new BasicDBObject().append(ETCOUNT, 1));
+//								
+//						tablaEtiquetas.updateOne(new Document().append(_ID, e.getTexto()), newDocument);
+//						
+////						System.out.println("count+: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+//				 
+//			 }
 			 
 			 
 			 
@@ -155,6 +159,74 @@ public class ModeloPrincipal {
 		 return false;
 	 }
 	 
+	 public void updateImagen(ImagenTemp it, String nuevoNombre, ArrayList<Etiquetas> arrayEtiquetasNuevas, ArrayList<Etiquetas> arrayetiquetasBorradas) {
+		 
+		 ObjectId tempId = it.getIdMongo();
+		 
+		 
+		 //ojo !
+		 if(!nuevoNombre.isEmpty()) {
+			 System.out.println("entraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+			 
+			 UpdateResult aaa = tablaImagenes.updateOne(eq(_ID,tempId), Updates.set(NOMBRE, (nuevoNombre + it.getExtension())));
+			 System.out.println("matches: " + aaa.getMatchedCount());
+			 System.out.println("modificados: " + aaa.getModifiedCount());
+			 
+		 }
+		 
+		//ojo !
+		 if(!arrayetiquetasBorradas.isEmpty() && !(arrayetiquetasBorradas==null)) {
+			 for(int i=0; i<arrayetiquetasBorradas.size(); i++) {
+				 tablaImagenes.updateOne(eq(_ID,tempId), Updates.pull(ETIQUETAS, arrayetiquetasBorradas.get(i).getTexto()));
+				 borrarEtiqueta(arrayetiquetasBorradas.get(i).getTexto());
+			 }
+		 }
+		 
+		//ojo !
+		 if(!arrayEtiquetasNuevas.isEmpty() && !(arrayEtiquetasNuevas==null)) {
+			 for(int i=0; i<arrayEtiquetasNuevas.size(); i++) {
+				 tablaImagenes.updateOne(eq(_ID,tempId), Updates.push(ETIQUETAS, arrayEtiquetasNuevas.get(i).getTexto()));
+				 anadirEtiqueta(arrayEtiquetasNuevas.get(i).getTexto());
+			 }
+		 }
+		 
+	 }
+	 
+//	 public void updateImagen(ImagenTemp it, String nuevoNombre, ArrayList<Etiquetas> nuevoArrayEtiquetas) {
+//		 
+//		 //obsoleto?
+//		 
+//		 //ojo !
+//		 if(!it.getNombre().equals(nuevoNombre)) {
+//			 tablaImagenes.updateOne(eq(_ID,it.getIdMongo()), Updates.set(NOMBRE, nuevoNombre));
+//		 }
+//		 
+//		 //bool[] con length del array etiquetas antiguo, será false solo en las etiquetas eliminadas de la imagen
+//		 boolean[] arrayIndicesEtBorradas = new boolean[it.getArrayEtiquetas().size()];
+//		 for(int i=0; i<arrayIndicesEtBorradas.length; i++) arrayIndicesEtBorradas[i]=false;
+//		 
+//		 for(Etiquetas et : nuevoArrayEtiquetas) {
+//			 
+//			 //Si arrayviejo contiene la etiqueta et (de arraynuevo), se marca true en el bool[]
+//			 if(it.getArrayEtiquetas().contains(et)) {
+//				 arrayIndicesEtBorradas[it.getArrayEtiquetas().indexOf(et)] = true;
+//			
+//			 //Si arraynuevo contiene una et que arrayviejo no, se añade la etiqueta	 
+//			 }else {
+//				 anadirEtiqueta(et.getTexto());
+//			 }
+//		 }
+//		 
+//		 //Se recorre el bool[], y en los casos false, se borra la etiqueta, porque serán
+//		 //los únicos en los que no han sido cambiados a true por el foreach anterior
+//		 for(int i=0; i<it.getArrayEtiquetas().size(); i++) {
+//			 if(arrayIndicesEtBorradas[i] == false) {
+//				 borrarEtiqueta(it.getArrayEtiquetas().get(i).getTexto());
+//			 }
+//		 }
+//		 
+//	 }
+	 
 	 public boolean borrarImagen(ObjectId id) {
 		 
 		 try {
@@ -163,11 +235,13 @@ public class ModeloPrincipal {
 			 
 			 for(String s : (ArrayList<String>) doc.get(ETIQUETAS)) {
 				 
-				 if(getCountEtiquetas(s) == 1) {
-					 tablaEtiquetas.deleteOne(eq(_ID,s));
-				 }else {
-					 tablaEtiquetas.updateOne(eq(_ID,s),Updates.inc(ETCOUNT, -1));
-				 }
+				 borrarEtiqueta(s);
+				 
+//				 if(getCountEtiquetas(s) == 1) {
+//					 tablaEtiquetas.deleteOne(eq(_ID,s));
+//				 }else {
+//					 tablaEtiquetas.updateOne(eq(_ID,s),Updates.inc(ETCOUNT, -1));
+//				 }
 	 
 			 }
 			 
@@ -183,9 +257,48 @@ public class ModeloPrincipal {
 		 
 	 }
 	 
-	 public int getCountEtiquetas(String str) {
+	 private void anadirEtiqueta(String strEt) {
 		 
-		 Document retorna = (Document) tablaEtiquetas.find(new Document(_ID,str)).first();
+		 //Si no existe esa etiqueta en BD
+		 if(tablaEtiquetas.find(new Document(_ID,strEt)).first() == null) {
+//			 System.out.println("etiquetas null");
+		 //if(tablaEtiquetas.countDocuments(new Document(_ID,e.getTexto())) == 0) {
+			 
+			 Document doc = new Document();
+			 doc.append(_ID, strEt);
+			 doc.append(ETCOUNT, 1);
+			 
+			 tablaEtiquetas.insertOne(doc);
+			 
+//			 System.out.println("count0: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+			 
+		 }else {
+			 System.out.println("etiquetas no null");
+			 Document newDocument = new Document();
+			 newDocument.append("$inc", new BasicDBObject().append(ETCOUNT, 1));
+							
+					tablaEtiquetas.updateOne(new Document().append(_ID, strEt), newDocument);
+					
+//					System.out.println("count+: " + tablaEtiquetas.find(new Document(_ID,e.getTexto())).first());
+			 
+		 }
+		 
+	 }
+	 
+	 //No borra per se, resta 1 de la tabla tablaEtiquetas y borra si getCount==1
+	 private void borrarEtiqueta(String strEt) {
+		 
+		 if(getCountEtiquetas(strEt) == 1) {
+		 tablaEtiquetas.deleteOne(eq(_ID,strEt));
+	 }else {
+		 tablaEtiquetas.updateOne(eq(_ID,strEt),Updates.inc(ETCOUNT, -1));
+	 }
+		 
+	 }
+	 
+	 public int getCountEtiquetas(String strEt) {
+		 
+		 Document retorna = (Document) tablaEtiquetas.find(new Document(_ID,strEt)).first();
 		 
 		 if(retorna==null) {
 			 return 0;
@@ -315,14 +428,23 @@ public class ModeloPrincipal {
 		 
 	 }
 	 
+	 public ImagenTemp getResultadoUnico(ObjectId idMongo) {
+		 
+		 ImagenTemp it = convierteDocObjeto((Document)tablaImagenes.find(eq(_ID,idMongo)).first()); 
+		 System.out.println("nombre de resultadounico: " + it.getNombre());
+		 
+		 return it;
+	 }
+	 
 	 
 	 
 	 
 	 private ImagenTemp convierteDocObjeto(Document d) {
 		 
 		 String url = (String) d.get(URL);
-		 System.out.println("la url es " + url);
+//		 System.out.println("la url es " + url);
 		 String nombreFull = (String) d.get(NOMBRE);
+//		 System.out.println("nombrefull: " + nombreFull);
 //		 //ArrayList<Etiquetas> etiquetas = (ArrayList<Etiquetas>) d.get(ETIQUETAS);
 //		 ArrayList<Etiquetas> etiquetas = new ArrayList<Etiquetas>();
 //		 for(String s : (String[]) d.get(ETIQUETAS)) {

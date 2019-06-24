@@ -90,7 +90,8 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 	private JPanel panelImagenEtiquetas;
 	
 	private JPanel panelImagenBotones;
-	private JButton botonBorrarImagen;
+	//private JButton botonBorrarImagen;
+	private JButton botonVerEnGrande;//TODO cambiar nombre
 	
 	
 	
@@ -252,8 +253,9 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		panelImagenEtiquetas.setPreferredSize(new Dimension(500,150));
 		
 		panelImagenBotones = new JPanel();
-		botonBorrarImagen = new JButton("Borrar imagen");
-		panelImagenBotones.add(botonBorrarImagen);
+		botonVerEnGrande = new JButton("Ver en grande");
+		panelImagenBotones.add(botonVerEnGrande);
+		
 		
 		
 		
@@ -357,9 +359,11 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		return opAnoAntes;
 	}
 	
-	public JButton getBotonBorrarImagen() {
-		return botonBorrarImagen;
+	public JButton getBotonVerEnGrande() {
+		return botonVerEnGrande;
 	}
+	
+	public ImagenTemp[] getArrayResultadosActuales() { return res; }
 	
 	public int getNumeroFilas() {
 		return ((GridLayout)resultadosGrid.getLayout()).getRows();
@@ -414,7 +418,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 				if(res[i] != null) {
 					PanelImagenRes temp = new PanelImagenRes();
 					resultadosGrid.add(temp);
-					temp.setImagen(res[i]);
+					temp.setImagen(res[i]);//--------------------aquí está la clave para actualizar
 					temp.addMouseListener(this);
 				}
 			}
@@ -427,7 +431,7 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		
 	}
 	
-	private void cambiarImagenGrande(ImagenTemp it) {
+	public void cambiarImagenGrande(ImagenTemp it) {
 		
 		Image imgtemp = VistaPrincipal.ponerImagenEscalada(it.getbImagen(), panelImagenGrande);
 		labelImagenGrande.setIcon(new ImageIcon(imgtemp));
@@ -564,39 +568,5 @@ public class VistaResultados extends JPanel implements KeyListener, MouseListene
 		
 	}
 	
-//	private void testAddKeyListener() {
-//		
-//		barraBusqueda.addKeyListener(new KeyListener() {
-//
-//			@Override
-//			public void keyPressed(KeyEvent arg0) {
-//				if(arg0.getKeyCode() == KeyEvent.VK_ENTER) {
-//					//TODO aquí no debería estar este actionperformed
-//					//panelEtiquetas.add(new Etiquetas(barraBusqueda.getText()));
-//					//panelEtiquetas.add(new JLabel(barraBusqueda.getText()));
-//					//System.out.println(barraBusqueda.getText());
-//					//barraBusqueda.setText("");
-//					//panelEtiquetas.revalidate();
-//					
-//					botonBuscar.doClick();
-//				}
-//				
-//			}
-//
-//			@Override
-//			public void keyReleased(KeyEvent arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//
-//			@Override
-//			public void keyTyped(KeyEvent arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//			
-//		});
-//		
-//	}
 
 }

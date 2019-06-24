@@ -22,6 +22,7 @@ public class ControladorPrincipal implements ActionListener{
 	ControladorAnadir controladorAnadir;
 	ControladorResultados controladorResultados;
 	ControladorCoincidencias controladorCoincidencias;
+	ControladorImagenDatos controladorImagenDatos;
 	
 	public ControladorPrincipal(ModeloPrincipal modeloPrincipal, VistaPrincipal vistaPrincipal){
 		
@@ -33,13 +34,17 @@ public class ControladorPrincipal implements ActionListener{
 		//vistaPrincipal.addCambiadorTest(cambiadorTest);
 		vistaPrincipal.getBotonBusquedaPrincipal().addActionListener(this);
 		vistaPrincipal.getVistaAnadir().getBotonCoincidencias().addActionListener(this);
+		vistaPrincipal.getVistaResultados().getBotonVerEnGrande().addActionListener(this);
+		vistaPrincipal.getVistaImagenDatos().getBotonVolver().addActionListener(this);
 		
 		controladorMenu = new ControladorMenu(vistaPrincipal);
 		controladorAnadir = new ControladorAnadir(vistaPrincipal.getVistaAnadir(), modeloPrincipal);
 		controladorResultados = new ControladorResultados(vistaPrincipal.getVistaResultados(), modeloPrincipal);
 		controladorCoincidencias = new ControladorCoincidencias(vistaPrincipal.getVistaCoincidencias());
+		controladorImagenDatos = new ControladorImagenDatos(vistaPrincipal.getVistaImagenDatos(), modeloPrincipal);
 		
-
+		
+		vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELINICIO);
 		
 	}
 
@@ -54,15 +59,40 @@ public class ControladorPrincipal implements ActionListener{
 				vistaPrincipal.getVistaResultados().setTextoBarra(vistaPrincipal.getTextoBarraBusqueda());
 				//controladorResultados.empezarBusqueda();
 				vistaPrincipal.getVistaResultados().getBotonBuscar().doClick();
-				vistaPrincipal.cambiaCardLayout("PANELRESULTADOS");
+				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
 				System.out.println("cambiado a PANELRESULTADOS");
 			}
 			
 		}else if(ev.getSource() == vistaPrincipal.getVistaAnadir().getBotonCoincidencias()) {
 			
 			controladorCoincidencias.setImagenTemp(controladorAnadir.getImagenTempActual());
-			vistaPrincipal.cambiaCardLayout("PANELCOINCIDENCIAS");
+			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELCOINCIDENCIAS);
 			System.out.println("cambiado a PANELCOINCIDENCIAS");
+			
+		}else if(ev.getSource() == vistaPrincipal.getVistaResultados().getBotonVerEnGrande()) {
+			
+//			System.out.println("test 2: " + vistaPrincipal.getVistaImagenDatos().getPanelIzq().getWidth());
+			controladorImagenDatos.setImagenTemp(vistaPrincipal.getVistaResultados().getImagenTempSeleccionado());
+			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELIMAGENDATOS);
+			System.out.println("cambiado a PANELIMAGENDATOS");
+			
+			
+			
+		}else if(ev.getSource() == vistaPrincipal.getVistaImagenDatos().getBotonVolver()) {
+			
+//			//TODO comprobar si los cambios se han guardado
+//			controladorImagenDatos.vaciar();
+//			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
+			
+			if(controladorImagenDatos.botonVolverPulsado()) {
+				//controladorImagenDatos.vaciar();
+				//vistaPrincipal.getVistaResultados().getBotonBuscar().doClick();
+				
+				controladorResultados.busqueda2(controladorImagenDatos.getImagenTemp().getIdMongo());
+				
+				//controladorResultados.empezarBusqueda(controladorResultados.busquedaConEtiquetasSeleccionada());
+				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
+			}
 			
 		}
 		
