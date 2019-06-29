@@ -31,55 +31,62 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		
-		String[] anosComboBox = new String[LocalDate.now().getYear()-1969];
-		
-//		for(int i=1970; i<LocalDate.now().getYear()+1; i++) {
-//			System.out.println(i + "-");
-//		}
-		int anoActual = LocalDate.now().getYear();
-		for(int i=anoActual; i>1969; i--) {
-			System.out.println(anoActual-i + "-" + i);
-		}
+		long aaa = 10;
+		int aa = 3;
+		long a = aaa/aa;
+		System.out.println(a);
 		
 		
-//		for(int i=1; i<32; i++) {
-//			System.out.print("\"" + i + "\", ");
-//		}
-//		System.out.println();
-//		System.out.println(LocalDate.now().getYear());
 		
-//		//Test2 test2 = new Test2();
+		
+//		String[] anosComboBox = new String[LocalDate.now().getYear()-1969];
 //		
-//		JFrame caca = new JFrame();
-//		caca.setSize(new Dimension(1280,900));
-//		caca.setLocationRelativeTo(null);
-//		
-//		
-//		
-//		JPanel paneltest1 = new JPanel();
-//		//paneltest1.add(new JLabel("AAAAAAAAAAAAAAAAAAAAA"));
-//		
-//		
-//		try {
-//			BufferedImage bi = ImageIO.read(new File("src/vista/img/bbb.jpg"));
-//			
-//			Graphics g = bi.getGraphics();
-//			
-//			//paneltest1.add(new JLabel(new ImageIcon(bi)));
-//			
-//			g.drawImage(bi,0,0,100,100,null);
-//			
-//			
-//		} catch (IOException e) {
-//			
-//			System.out.println("caca");
-//			
+////		for(int i=1970; i<LocalDate.now().getYear()+1; i++) {
+////			System.out.println(i + "-");
+////		}
+//		int anoActual = LocalDate.now().getYear();
+//		for(int i=anoActual; i>1969; i--) {
+//			System.out.println(anoActual-i + "-" + i);
 //		}
 //		
-//		caca.add(paneltest1);
 //		
-//		caca.setVisible(true);
+////		for(int i=1; i<32; i++) {
+////			System.out.print("\"" + i + "\", ");
+////		}
+////		System.out.println();
+////		System.out.println(LocalDate.now().getYear());
+//		
+////		//Test2 test2 = new Test2();
+////		
+////		JFrame caca = new JFrame();
+////		caca.setSize(new Dimension(1280,900));
+////		caca.setLocationRelativeTo(null);
+////		
+////		
+////		
+////		JPanel paneltest1 = new JPanel();
+////		//paneltest1.add(new JLabel("AAAAAAAAAAAAAAAAAAAAA"));
+////		
+////		
+////		try {
+////			BufferedImage bi = ImageIO.read(new File("src/vista/img/bbb.jpg"));
+////			
+////			Graphics g = bi.getGraphics();
+////			
+////			//paneltest1.add(new JLabel(new ImageIcon(bi)));
+////			
+////			g.drawImage(bi,0,0,100,100,null);
+////			
+////			
+////		} catch (IOException e) {
+////			
+////			System.out.println("caca");
+////			
+////		}
+////		
+////		caca.add(paneltest1);
+////		
+////		caca.setVisible(true);
 		
 		
 

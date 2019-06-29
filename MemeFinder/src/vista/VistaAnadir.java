@@ -1,27 +1,16 @@
 package vista;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import controlador.ImagenTemp;
 
-public class VistaAnadir extends JPanel implements ActionListener{
-	
-	private JPanel panelPrincipalAnadir;
+public class VistaAnadir extends JPanel {
 	
 	private JPanel panelIzquierdo;
 	
@@ -48,21 +37,13 @@ public class VistaAnadir extends JPanel implements ActionListener{
 
 	private JPanel panelEtiquetasAnadir;
 	private JPanel panelBotonesEtiquetas;
+	private JButton botonVolver;
 	private JButton botonEnviarAnadir;
 	private JButton botonCancelarAnadir;
-	
-	
-	//private PanelCoincidencias panelCoincidenciasAnadir;
-	
 	
 	private JFileChooser elegidor;
 	
 	public VistaAnadir() {
-		
-		//CardLayout layOutAnadir = new CardLayout();
-		
-		
-		//panelPrincipalAnadir = new JPanel(new GridLayout(1,2,10,10));
 		
 		this.setLayout(new GridLayout(1, 2, 10, 10));
 		
@@ -88,7 +69,6 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		panelOpcionesImagen = new JPanel();
 		loBoxOpcionesImagen = new BoxLayout(panelOpcionesImagen,BoxLayout.Y_AXIS);
 		panelOpcionesImagen.setLayout(loBoxOpcionesImagen);
-		//panelOpcionesImagen.setBackground(Color.YELLOW);
 		
 				//--1. barra etiquetas
 		panelBarraEtiquetas = new JPanel();
@@ -119,8 +99,9 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		
 			//-----SUR: botones
 		panelBotonesEtiquetas = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		botonVolver = new JButton("<< Volver");
 		botonEnviarAnadir = new JButton("Enviar imagen");
-		botonCancelarAnadir = new JButton("Eliminar imagen (//TODO)");
+		botonCancelarAnadir = new JButton("Eliminar imagen");
 		
 		
 		
@@ -129,16 +110,10 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		panelOpcionesImagen.add(panelNombreImagen);
 		panelOpcionesImagen.add(panelInfoHash);
 		panelOpcionesImagen.add(Box.createVerticalStrut(15));
-//		panelOpcionesImagen.add(new JLabel("test1"));
-//		panelOpcionesImagen.add(new JLabel("test2"));
-//		panelOpcionesImagen.add(new JLabel("test1"));
-//		panelOpcionesImagen.add(new JLabel("test2"));
-//		panelOpcionesImagen.add(new JLabel("test1"));
-//		panelOpcionesImagen.add(new JLabel("test2"));
-//		panelOpcionesImagen.add(new JLabel("test1"));
-//		panelOpcionesImagen.add(new JLabel("test2"));
+
 		panelDerecho.add(panelOpcionesImagen, BorderLayout.NORTH);
 		panelDerecho.add(panelEtiquetasAnadir, BorderLayout.CENTER);
+		panelBotonesEtiquetas.add(botonVolver);
 		panelBotonesEtiquetas.add(botonCancelarAnadir);
 		panelBotonesEtiquetas.add(botonEnviarAnadir);
 		panelDerecho.add(panelBotonesEtiquetas, BorderLayout.SOUTH);
@@ -147,14 +122,6 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		this.add(panelIzquierdo);
 		this.add(panelDerecho);
 		
-		//this.add(panelPrincipalAnadir);
-		
-		//panelCoincidenciasAnadir = new PanelCoincidencias();
-		
-		
-		//TODO borrar?
-		botonDireccion.addActionListener(this);
-		barraEtiquetas.addActionListener(this);
 		
 	}
 	
@@ -179,6 +146,11 @@ public class VistaAnadir extends JPanel implements ActionListener{
 	{
 		return barraNombreImagen;
 	}
+	
+	public JButton getBotonVolver() {
+		return botonVolver;
+	}
+	
 	public JButton getBotonEnviar() {
 		return botonEnviarAnadir;
 	}
@@ -199,41 +171,28 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		return botonCoincidencias;
 	}
 	
-//	private void hashCompleto() {
-//		
-//	}
 	
 	public synchronized void setNuevaImagen(ImagenTemp imagenTemp, int num1, int num2) {
 		
-		//System.out.println("testnom: " + imagenTemp.getNombre());
-		//barraDireccion.setText(direccion); //DEPRECATED preventivo, barra useless ahora mismo
 		panelImagen.cambiarImagen(imagenTemp.getbImagen(), num1, num2);
 		
-		//barraDireccion.setText(imagenTemp.getNombre()); //DEPRECATED??
 		barraNombreImagen.setText(imagenTemp.getNombre());
 		
 		panelEtiquetasAnadir.removeAll();
 		//ojo al !
 		if(!imagenTemp.getArrayEtiquetas().isEmpty()) {
-			for(int i=0; i<imagenTemp.getArrayEtiquetas().size(); i++) {
-				anadirEtiqueta(imagenTemp.getArrayEtiquetas().get(i));
-			}
+			for(Etiquetas et : imagenTemp.getArrayEtiquetas()) anadirEtiqueta(et);
 		}
 		
 		if(imagenTemp.getPHash() == null) {
 			
-			System.out.println("hashing en proceso, getphash==null");
-			//panelInfoHash.remove(botonCoincidencias);
 			botonCoincidencias.setEnabled(false);
-			botonEnviarAnadir.setEnabled(false);//asegurar el true si hash!=""
-			estadoHashing.setText("El hashing va en proceso.");
+			botonEnviarAnadir.setEnabled(false);
 			panelInfoHash.setBackground(Color.RED);
 			
 		}else {
 			
-			System.out.println("ni hashing ni na, getphash!=null");
 			botonEnviarAnadir.setEnabled(true);
-			//estadoHashing.setText(imagenTemp.getTextoHashing());
 			panelInfoHash.setBackground(Color.GREEN);
 			
 			int cuenta = (imagenTemp.getArrayComparaciones().isEmpty()) ? 0 : imagenTemp.getArrayComparaciones().size();
@@ -243,61 +202,45 @@ public class VistaAnadir extends JPanel implements ActionListener{
 			switch(cuenta) {
 			case 0:
 				textoAMostrar = "No se han encontrado imágenes similares (" + ms + "ms).";
-				//panelInfoHash.remove(botonCoincidencias);
 				botonCoincidencias.setEnabled(false);
 				break;
 			case 1:
 				textoAMostrar = "Se ha encontrado 1 imagen similar (" + ms + "ms).";
-				//panelInfoHash.add(botonCoincidencias);
 				botonCoincidencias.setEnabled(true);
 				break;
 			default:
 				textoAMostrar = "Se han encontrado " + cuenta + " imágenes similares (" + ms + "ms).";
-				//panelInfoHash.add(botonCoincidencias);
 				botonCoincidencias.setEnabled(true);
 				break;
 			}
 			
 			estadoHashing.setText(textoAMostrar);
 			
-			
 		}
 		
-		//TODO meter if:
-		//si hash=="" desactivar enviar y texto cargando
-		//si hash!="" cargar con coincidencias (almacenar coincidencias en imagentemp???)
 		panelEtiquetasAnadir.repaint();
 		panelEtiquetasAnadir.revalidate();
-		
-		//i.e. si se llama desde la interfaz
-		//ojo !
-//		if(!cambiaHash) {
-//			
-//			
-//		
-//		//i.e. si se llama desde el hilo de hashing
-//		}else {
-//			
-//			hashCompleto();
-//			
-//		}
-
 		
 	}
 	
 	public void vaciar() {
+		
 		panelImagen.vaciar();
 		panelImagen.repaint();
 		panelImagen.revalidate();
 		estadoHashing.setText("");
 		barraNombreImagen.setText("");
 		botonCoincidencias.setEnabled(false);
+		botonEnviarAnadir.setEnabled(false);
+		botonCancelarAnadir.setEnabled(false);
 		panelEtiquetasAnadir.removeAll();
 		panelEtiquetasAnadir.repaint();
 		panelEtiquetasAnadir.revalidate();
+		
 	}
 	
 	public void anadirEtiqueta(Etiquetas et) {
+		
 		panelEtiquetasAnadir.add(et);
 		panelEtiquetasAnadir.repaint();
 		panelEtiquetasAnadir.revalidate();
@@ -310,28 +253,7 @@ public class VistaAnadir extends JPanel implements ActionListener{
 		panelEtiquetasAnadir.repaint();
 		panelEtiquetasAnadir.revalidate();
 		
-		
 	}
-
-
-	@Override
-	public void actionPerformed(ActionEvent ev) {
-		
-	}
-	
-	//GIF ANIMADO
-//	ImageIcon imgif = new ImageIcon("src/vista/img/aaa.gif");
-////	imgif.setImageObserver(new ImageObserver() {
-////
-////		@Override
-////		public boolean imageUpdate(Image arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
-////			repaint();
-////			return false;
-////		}
-////		
-////	});
-//	JLabel test = new JLabel(imgif);
-//	panelInicio.add(test);
 
 
 }

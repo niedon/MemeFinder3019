@@ -12,30 +12,14 @@ public class ControladorMenu implements ActionListener{
 	private JMenuBar menuPrincipal;
 	private VistaPrincipal vistaPrincipal;
 	
-//	private JMenuItem anadirElementos;
-	
-	JMenu archivo;
-	JMenuItem anadirImagenes;
-	JMenuItem opciones;
+	private JMenu archivo;
+	private JMenuItem anadirImagenes;
+	private JMenuItem opciones;
 
 	public ControladorMenu(VistaPrincipal vistaPrincipal) {
 		
 		this.vistaPrincipal = vistaPrincipal;
 		this.menuPrincipal = vistaPrincipal.getMenuPrincipal();
-		
-//		anadirElementos = new JMenuItem("Añadir");
-//		anadirElementos.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				vistaPrincipal.cambiaCardLayout("PANELANADIR");
-//				System.out.println("cambiado a PANELANADIR");
-//				
-//			}
-//			
-//		});
-//		
-//		menuPrincipal.add(anadirElementos);
 
 		archivo = new JMenu("Archivo");
 		
@@ -49,17 +33,13 @@ public class ControladorMenu implements ActionListener{
 		
 		menuPrincipal.add(archivo);
 		
-		
-		
-		
-		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		
 		if(ev.getSource() == anadirImagenes) {
-			vistaPrincipal.cambiaCardLayout("PANELANADIR");//TODO popup filechooser
+			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELANADIR);
 		}
 		
 	}

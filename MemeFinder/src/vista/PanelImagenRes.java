@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -15,7 +14,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import controlador.ControladorPrincipal;
 import controlador.ImagenTemp;
 
 public class PanelImagenRes extends JPanel implements ComponentListener, MouseListener{
@@ -38,33 +36,23 @@ public class PanelImagenRes extends JPanel implements ComponentListener, MouseLi
 	
 	private JPanel panelInferior;
 	
-	
-	//public PanelImagenRes(ImagenTemp itemp) {
 	public PanelImagenRes() {
-		
-		//this.itemp = itemp;
 		
 		this.setLayout(new BorderLayout());
 		this.setBorder(BorderFactory.createLineBorder(Color.GRAY,3,true));
 		
 		panelGeneral = new JPanel(new BorderLayout());
-		
-		
-		
 		panelGeneral.setBorder(new EmptyBorder(5,5,5,5));
 		
 		
 		panelLateral = new JPanel();
 		panelLateral.setPreferredSize(new Dimension(130,130));//TODO mejorar, está aquí temporal
-		//panelLateral.setSize(new Dimension(130,130));//TODO mejorar, está aquí temporal
 		
 		panelLateral.setLayout(null);
-		//panelLateral.setBackground(Color.RED);
 		labelImagen = new JLabel();
 		panelLateral.add(labelImagen);
 		
 		
-		//panelCentral = new JPanel(new GridLayout(2,1));
 		panelCentral = new JPanel(new BorderLayout());
 		
 		panelSuperior = new JPanel(new BorderLayout());
@@ -88,44 +76,12 @@ public class PanelImagenRes extends JPanel implements ComponentListener, MouseLi
 		
 		this.add(panelGeneral);
 		
-		
-		//---------------Añadir datos
-		
-//		labelImagen.setIcon(new ImageIcon(VistaPrincipal.ponerImagen(itemp.getbImagen(), panelLateral)));
-//		labelNombre.setText(itemp.getNombre()+itemp.getExtension());
-//		labelFecha.setText(itemp.getFecha()+"");
-//		
-//		for(Etiquetas e : itemp.getArrayEtiquetas()) {
-//			panelInferior.add(e);
-//		}
-		
-//		//---test
-//		
-//		System.out.println(panelLateral.getPreferredSize());
-//		System.out.println(panelLateral.getMaximumSize());
-//		System.out.println(panelLateral.getMinimumSize());
-//		System.out.println(panelLateral.getSize());
-//		this.addMouseListener(this);
-		
-		
-		
 	}
 	
 	public void setImagen(ImagenTemp itemp) {
 		this.itemp = itemp;
 		
 		panelLateral.setSize(130,130);
-		
-//		System.out.println("- " +this.getPreferredSize());
-//		System.out.println("- " +this.getMaximumSize());
-//		System.out.println("- " +this.getMinimumSize());
-//		System.out.println("- " +this.getSize());
-//		System.out.println("aaaaaaaaaaaaaaaaaaaa");
-//		System.out.println(this.getLayout().preferredLayoutSize(panelLateral));
-		
-		
-		//panelLateral.setSize(new Dimension(panelLateral.getHeight(),panelLateral.getHeight()));
-		
 		
 		Image imgOriginal = VistaPrincipal.ponerImagenEscalada(itemp.getbImagen(), panelLateral);
 		labelImagen.setIcon(new ImageIcon(imgOriginal));
@@ -145,26 +101,6 @@ public class PanelImagenRes extends JPanel implements ComponentListener, MouseLi
 		return itemp;
 	}
 	
-//	public void revalidate() {
-//		super.revalidate();
-//		panelLateral.setPreferredSize(new Dimension(154,154));//TODO mejorar, está aquí temporal
-//		panelLateral.setSize(new Dimension(154,154));//TODO mejorar, está aquí temporal
-//	}
-	
-//	public String getdimensiones() {
-//		System.out.println("- " +this.getPreferredSize());
-//		System.out.println("- " +this.getMaximumSize());
-//		System.out.println("- " +this.getMinimumSize());
-//		System.out.println("- " +this.getSize());
-//		return "y la casualidad";
-//		
-//	}
-	
-	
-	
-	
-	
-
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
 		System.out.println("hidden");

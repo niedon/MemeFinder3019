@@ -3,7 +3,6 @@ package controlador;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -32,6 +31,8 @@ public class ImagenTemp {
 	private ArrayList<ImagenTemp> arrayComparaciones;
 	private long tiempoEnHashear;
 	
+	private boolean anadirIgualmente;
+	
 	
 	public ImagenTemp(String url, String nombreYExtension) {
 		
@@ -39,15 +40,14 @@ public class ImagenTemp {
 		try {
 			this.bImagen = ImageIO.read(imagen);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.arrayEtiquetas = new ArrayList<Etiquetas>();
-		//this.pHash = "";
 		this.pHash = null;
 		this.nombre = nombreYExtension.substring(0,nombreYExtension.lastIndexOf('.'));
 		this.extension = nombreYExtension.substring(nombreYExtension.lastIndexOf('.'));
 		this.fecha = System.currentTimeMillis();
+		this.anadirIgualmente = false;
 		
 		
 	}
@@ -103,21 +103,8 @@ public class ImagenTemp {
 		return pHash;
 	}
 	
-//	public Boolean[] getPHashWrap() {
-//		Boolean[] retorna = new Boolean[pHash.length];
-//		for(int i=0; i<retorna.length; i++) {
-//			retorna[i] = pHash[i];
-//		}
-//		return retorna;
-//	}
-	
 	public void setPHash(Boolean[] pHash) {
 		this.pHash = pHash;
-		//textoTempDelHash = "Hashing completito, shurmanus";
-//		for(Boolean b : pHash) {
-//			System.out.print(b + "-");
-//		}
-		
 	}
 	
 	public String getNombre() {
@@ -178,7 +165,13 @@ public class ImagenTemp {
 		this.tiempoEnHashear = tiempoEnHashear;
 	}
 	
+	public boolean getAnadirIgualmente() {
+		return anadirIgualmente;
+	}
 	
+	public void setAnadirIgualmente(boolean anadirIgualmente) {
+		this.anadirIgualmente = anadirIgualmente;
+	}
 	
 
 

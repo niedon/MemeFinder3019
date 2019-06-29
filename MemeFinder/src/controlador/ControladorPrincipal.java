@@ -2,9 +2,8 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
-import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 
 import modelo.*;
 import vista.*;
@@ -16,7 +15,6 @@ public class ControladorPrincipal implements ActionListener{
 	ModeloPrincipal modeloPrincipal;
 	VistaPrincipal vistaPrincipal;
 	
-	//CambiadorTest cambiadorTest;
 	
 	ControladorMenu controladorMenu;
 	ControladorAnadir controladorAnadir;
@@ -29,21 +27,22 @@ public class ControladorPrincipal implements ActionListener{
 		this.modeloPrincipal = modeloPrincipal;
 		this.vistaPrincipal = vistaPrincipal;
 		
-		//cambiadorTest = new CambiadorTest(vistaPrincipal);
-		
-		//vistaPrincipal.addCambiadorTest(cambiadorTest);
-		vistaPrincipal.getBotonBusquedaPrincipal().addActionListener(this);
-		vistaPrincipal.getVistaAnadir().getBotonCoincidencias().addActionListener(this);
-		vistaPrincipal.getVistaResultados().getBotonVerEnGrande().addActionListener(this);
-		vistaPrincipal.getVistaImagenDatos().getBotonVolver().addActionListener(this);
-		
 		controladorMenu = new ControladorMenu(vistaPrincipal);
 		controladorAnadir = new ControladorAnadir(vistaPrincipal.getVistaAnadir(), modeloPrincipal);
 		controladorResultados = new ControladorResultados(vistaPrincipal.getVistaResultados(), modeloPrincipal);
 		controladorCoincidencias = new ControladorCoincidencias(vistaPrincipal.getVistaCoincidencias());
 		controladorImagenDatos = new ControladorImagenDatos(vistaPrincipal.getVistaImagenDatos(), modeloPrincipal);
 		
+		//Se añaden los Listener implicados en el cambio de panel
+		vistaPrincipal.getBotonBusquedaPrincipal().addActionListener(this);
+		vistaPrincipal.getVistaAnadir().getBotonCoincidencias().addActionListener(this);
+		vistaPrincipal.getVistaAnadir().getBotonVolver().addActionListener(this);
+		vistaPrincipal.getVistaCoincidencias().getBotonAnadirIgualmente().addActionListener(this);
+		vistaPrincipal.getVistaCoincidencias().getBotonVolver().addActionListener(this);
+		vistaPrincipal.getVistaResultados().getBotonVerEnGrande().addActionListener(this);
+		vistaPrincipal.getVistaImagenDatos().getBotonVolver().addActionListener(this);
 		
+		//Por defecto, se empieza en el panel PANELINICIO
 		vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELINICIO);
 		
 	}
@@ -51,47 +50,75 @@ public class ControladorPrincipal implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		
+		//Botón de búsqueda de la vista Principal
 		if(ev.getSource()==vistaPrincipal.getBotonBusquedaPrincipal()) {
 			
-			if(vistaPrincipal.getTextoBarraBusqueda().equals("") || vistaPrincipal.getTextoBarraBusqueda().equals(null)) {
-				System.out.println("buscar principal vacío");
-			}else {
+			//La búsqueda empieza si hay algo escrito en la barra
+			if(!vistaPrincipal.getTextoBarraBusqueda().isEmpty()) {
 				vistaPrincipal.getVistaResultados().setTextoBarra(vistaPrincipal.getTextoBarraBusqueda());
-				//controladorResultados.empezarBusqueda();
-				vistaPrincipal.getVistaResultados().getBotonBuscar().doClick();
+				vistaPrincipal.getVistaResultados().getBotonBuscar().doClick();//TODO chapucero, cambiar
 				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
-				System.out.println("cambiado a PANELRESULTADOS");
 			}
-			
+		
+		//Botón de coincidencias encontradas de la vista Añadir	
 		}else if(ev.getSource() == vistaPrincipal.getVistaAnadir().getBotonCoincidencias()) {
 			
 			controladorCoincidencias.setImagenTemp(controladorAnadir.getImagenTempActual());
 			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELCOINCIDENCIAS);
-			System.out.println("cambiado a PANELCOINCIDENCIAS");
 			
+			
+		//Botón volver en VistaAñadir	
+		}else if(ev.getSource() == vistaPrincipal.getVistaAnadir().getBotonVolver()) {
+			
+			//ojo !
+			if(!controladorAnadir.getArrayListImagenes().isEmpty()) {
+				
+				int res = JOptionPane.showConfirmDialog(null, "Quedan imágenes por añadir, ¿las quieres guardar?","",JOptionPane.YES_NO_CANCEL_OPTION);
+				
+				if(res == JOptionPane.NO_OPTION) {
+					controladorAnadir.vaciar();
+					vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELINICIO);
+				}else if(res == JOptionPane.YES_OPTION) {
+					vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELINICIO);
+				}
+				
+			}else {
+				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELINICIO);
+			}
+		
+		//Botón de añadir igualmente en VistaCoincidencias	
+		}else if(ev.getSource() == vistaPrincipal.getVistaCoincidencias().getBotonAnadirIgualmente()) {	
+		
+			controladorCoincidencias.vaciar();
+			controladorAnadir.getImagenTempActual().setAnadirIgualmente(true);
+			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELANADIR);
+			
+		//Botón de volver en VistaCoincidencias	
+		}else if(ev.getSource() == vistaPrincipal.getVistaCoincidencias().getBotonVolver()) {		
+			
+			controladorCoincidencias.vaciar();
+			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELANADIR);
+			
+			
+		//Botón de ampliar vista en vista Resultados	
 		}else if(ev.getSource() == vistaPrincipal.getVistaResultados().getBotonVerEnGrande()) {
 			
-//			System.out.println("test 2: " + vistaPrincipal.getVistaImagenDatos().getPanelIzq().getWidth());
-			controladorImagenDatos.setImagenTemp(vistaPrincipal.getVistaResultados().getImagenTempSeleccionado());
-			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELIMAGENDATOS);
-			System.out.println("cambiado a PANELIMAGENDATOS");
+			//TODO seleccionar desde controladorResultados en vez de vistaReusltados???
+			if(vistaPrincipal.getVistaResultados().getImagenTempSeleccionado() != null) {
+				controladorImagenDatos.setImagenTemp(vistaPrincipal.getVistaResultados().getImagenTempSeleccionado());
+				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELIMAGENDATOS);
+			}
 			
 			
 			
+		//Botón de volver a VistaResultados desde VistaImagenDatos	
 		}else if(ev.getSource() == vistaPrincipal.getVistaImagenDatos().getBotonVolver()) {
 			
-//			//TODO comprobar si los cambios se han guardado
-//			controladorImagenDatos.vaciar();
-//			vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
-			
 			if(controladorImagenDatos.botonVolverPulsado()) {
-				//controladorImagenDatos.vaciar();
-				//vistaPrincipal.getVistaResultados().getBotonBuscar().doClick();
 				
-				controladorResultados.busqueda2(controladorImagenDatos.getImagenTemp().getIdMongo());
-				
-				//controladorResultados.empezarBusqueda(controladorResultados.busquedaConEtiquetasSeleccionada());
+				controladorResultados.busquedaParaActualizarImagenTempUpdateada(controladorImagenDatos.getImagenTemp().getIdMongo());
 				vistaPrincipal.cambiaCardLayout(VistaPrincipal.PANELRESULTADOS);
+				
 			}
 			
 		}

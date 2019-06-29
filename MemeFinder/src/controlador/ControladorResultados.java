@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 import org.bson.types.ObjectId;
 
@@ -49,11 +48,9 @@ public class ControladorResultados implements ActionListener {
 		siguiente = vistaResultados.getSiguiente();
 		siguiente.addActionListener(this);
 		
+		//Limita el mayor año de búsqueda como el año actual, siendo el primero 1970
 		int anoActual = LocalDate.now().getYear();
-		//String[] anosComboBox = new String[anoActual-1969];
 		for(int i=anoActual; i>1969; i--) {
-			//System.out.println(anoActual-i + "-" + i);
-			//anosComboBox[anoActual-1] = i+"";
 			vistaResultados.getOpAnoAntes().addItem(i+"");
 			vistaResultados.getOpAnoDespues().addItem(i+"");
 		}
@@ -67,38 +64,37 @@ public class ControladorResultados implements ActionListener {
 		return botonBuscar;
 	}
 	
-	//public boolean busquedaConEtiquetasSeleccionada() { return !vistaResultados.getOpBuscarSinEtiqueta().isSelected(); }
-	
-	public void busqueda2(ObjectId idMongo) {
-		//controladorResultados.empezarBusqueda(controladorResultados.busquedaConEtiquetasSeleccionada());
+	public void busquedaParaActualizarImagenTempUpdateada(ObjectId idMongoImagenTempActualizada) {
+		
 		empezarBusqueda(!vistaResultados.getOpBuscarSinEtiqueta().isSelected());
 		
 		int numeroContiene = -1;
 		
+		//Se busca en qué posición del array resultados actuales está la imagen actualizada
 		for(int i=0; i<vistaResultados.getArrayResultadosActuales().length; i++) {
-			if(vistaResultados.getArrayResultadosActuales()[i].getIdMongo().equals(idMongo)) {
+			if(vistaResultados.getArrayResultadosActuales()[i].getIdMongo().equals(idMongoImagenTempActualizada)) {
 				numeroContiene=i;
 				break;
 			}
 		}
 		
-		if(numeroContiene == -1) {
-			vistaResultados.vaciarImagenGrande();
-		}else {
-			vistaResultados.cambiarImagenGrande(vistaResultados.getArrayResultadosActuales()[numeroContiene]);
-		}
+		//Si no está, se vacía la imagen ampliada (panel este)
+		if(numeroContiene == -1) vistaResultados.vaciarImagenGrande();
+		//Si está, se actualiza
+		else vistaResultados.cambiarImagenGrande(vistaResultados.getArrayResultadosActuales()[numeroContiene]);
 		
 		
 	}
 	
 	public void empezarBusqueda(boolean buscarConEtiquetas) {//TODO sincronizar y hacer a thread de búsqueda acceder aquí?
 		
-		System.out.println("buscar, etiquetas: " + buscarConEtiquetas);
-		
-		numPagina = 0;
+		numPagina = 0;//Se vuelve a la página 1 (por si el usuario había buscado mirando una página posterior)
 		
 		if(buscarConEtiquetas) arrayResultados = modeloPrincipal.getArrayResultados(arrayEtiquetasBusqueda,fechaDespuesDe,fechaAntesDe);
 		else arrayResultados = modeloPrincipal.getArrayResultados(null, fechaDespuesDe,fechaAntesDe);
+
+		//Línea alternativa a las dos anteriores:
+		//modeloPrincipal.getArrayResultados((buscarConEtiquetas ? arrayEtiquetasBusqueda : null), fechaDespuesDe, fechaAntesDe)
 		
 		mostrarResultados();
 		
@@ -108,9 +104,9 @@ public class ControladorResultados implements ActionListener {
 	
 	private void mostrarResultados(){
 		
-		int maxPorPagina = vistaResultados.getNumeroFilas();//Número de filas del panel resultados central
+		//Número de filas del panel resultados central
+		int maxPorPagina = vistaResultados.getNumeroFilas();
 		
-		//numPagina = 0;//declarar como campo de clase (empieza en cero)
 		numTotalPaginas = 0;
 		
 		//Suma una página si %!=0
@@ -123,13 +119,9 @@ public class ControladorResultados implements ActionListener {
 								((numPagina*maxPorPagina)+2)>= arrayResultados.size() ? null : arrayResultados.get((numPagina*maxPorPagina)+2),
 								((numPagina*maxPorPagina)+3)>= arrayResultados.size() ? null : arrayResultados.get((numPagina*maxPorPagina)+3)};
 		
-		vistaResultados.anadirResultados(retorna, numPagina+1, numTotalPaginas);//TODO evitar bug de pág 1/0 cuando no hay resultados
+		vistaResultados.anadirResultados(retorna, numPagina+1, numTotalPaginas);
 		
-//		anterior.setEnabled(false);
-//		if(numTotalPaginas==1) siguiente.setEnabled(false);
-//		else siguiente.setEnabled(true);
-		
-		//TEST activar/desactivar botones anterior/siguiente en función a las páginas que hay
+		//Activa/desactiva botones anterior/siguiente en función a las páginas que haya
 		anterior.setEnabled(numPagina != 0);
 		siguiente.setEnabled(numPagina+1 != numTotalPaginas);
 		
@@ -156,28 +148,14 @@ public class ControladorResultados implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		
-//		if(ev.getSource()==vistaResultados.getOpBuscarSinEtiqueta()) {
-//			
-//			if(vistaResultados.getOpBuscarSinEtiqueta().isSelected()) {
-//				empezarBusqueda(false);
-//			}else {
-//				empezarBusqueda(true);
-//			}
-//			
-//		}else if(ev.getSource()==vistaResultados.getBotonBuscar()) {
 		if(ev.getSource()==botonBuscar) {
 			
-//			System.out.println(vistaResultados.getFechaAntes());
-//			System.out.println(vistaResultados.getFechaDespues());
-			
 			boolean erroresFormulario = false;
-//			boolean hayFechaBien = false;
 			
-			//Comprueba que la fecha sea correcta (eg¬31feb)
+			//Comprueba que la fecha sea correcta (eg !31feb)
 			if(vistaResultados.getOpFechaDespues().isSelected()){
 				fechaDespuesDe = getFechaDesdeTexto(vistaResultados.getFechaDespues());
 				if(fechaDespuesDe==null) erroresFormulario = true;//TODO mostrar tooltip
-				System.out.println("despues " + fechaDespuesDe);
 			}else {
 				fechaDespuesDe = null;
 			}
@@ -186,7 +164,6 @@ public class ControladorResultados implements ActionListener {
 			if(vistaResultados.getOpFechaAntes().isSelected()) {
 				fechaAntesDe = getFechaDesdeTexto(vistaResultados.getFechaAntes());
 				if(fechaAntesDe==null) erroresFormulario = true;//TODO mostrar tooltip
-				System.out.println("antes " + fechaAntesDe);
 			}else {
 				fechaAntesDe = null;
 			}
@@ -194,11 +171,8 @@ public class ControladorResultados implements ActionListener {
 			//Si está activada la búsqueda sin etiquetas
 			if(vistaResultados.getOpBuscarSinEtiqueta().isSelected()) {
 				
-				if(!erroresFormulario) {
-					System.out.println("no hay errores (buscar sin etiq)");
-					empezarBusqueda(false);
-				}
-				
+				if(!erroresFormulario) empezarBusqueda(false);
+				else System.out.println("errores en el formulario");
 			
 			//Si se busca normal (con etiquetas)	
 			}else {
@@ -223,7 +197,7 @@ public class ControladorResultados implements ActionListener {
 				
 				if(!erroresFormulario) {
 					System.out.println("no hay errores (buscar con etiq)");
-					//TODO más adelante, no buscar si la fecha **no ha cambiado**, para optimizar recursos
+					//TODO más adelante, no buscar si la fecha NO ha cambiado, para optimizar recursos
 					empezarBusqueda(true);
 					
 				
@@ -237,36 +211,46 @@ public class ControladorResultados implements ActionListener {
 			
 			numPagina--;
 			mostrarResultados();
-//			if(!siguiente.isEnabled()) siguiente.setEnabled(true);
-//			if(numPagina==1) anterior.setEnabled(false); 
 			
 		}else if(ev.getSource()==siguiente) {
 			
 			numPagina++;
 			mostrarResultados();
-//			if(!anterior.isEnabled()) anterior.setEnabled(true);
-//			if(numPagina == numTotalPaginas-1) siguiente.setEnabled(false);
 			
-			
+		
+		//Si se pulsa en la X de una etiqueta buscada	
 		}else if(ev.getSource() instanceof Etiquetas) {
 			
-			if(arrayEtiquetasBusqueda.contains(ev.getSource())) {
+			//Si no se ha seleccionado Búsqueda sin etiquetas (si se selecciona se inhabilitan las etiquetas)
+			if(!vistaResultados.getOpBuscarSinEtiqueta().isSelected()) {
 				
-				arrayEtiquetasBusqueda.remove(ev.getSource());
-				vistaResultados.getPanelEtiquetas().remove((Etiquetas)ev.getSource());
-				
-				if(arrayEtiquetasBusqueda.isEmpty()) {
-					vistaResultados.anadirResultados(null, 0, 0);//TODO crear método de vaciar vista en vez de hacerlo así cutre??
-				}else {
+				//Si el array de etiquetas contiene esa etiqueta
+				if(arrayEtiquetasBusqueda.contains(ev.getSource())) {
 					
-					if(((Etiquetas)ev.getSource()).getCuenta() != 0) {
-						empezarBusqueda(true);
+					//Se borra la etiqueta del array
+					arrayEtiquetasBusqueda.remove(ev.getSource());
+					vistaResultados.getPanelEtiquetas().remove((Etiquetas)ev.getSource());
+					
+					//Si el array queda vacío, se vacía el panel
+					if(arrayEtiquetasBusqueda.isEmpty()) {
+						vistaResultados.anadirResultados(null, 0, 0);//TODO crear método de vaciar vista en vez de hacerlo así cutre??
+						
+					//Si quedan etiquetas
+					}else {
+						
+						//Si la etiqueta borrada no tenía 0 resultados se empieza la búsqueda
+						if(((Etiquetas)ev.getSource()).getCuenta() != 0) {
+							empezarBusqueda(true);//TODO controlar el parámetro en caso de que sea posible borrar etiquetas con la opción busqueda sin etiquetas seleccionada
+						}
+						
 					}
 					
+					vistaResultados.revalidate();
+					vistaResultados.repaint();
+					
+				}else {
+					System.out.println("ERROR, se ha dado a borrar una etiqueta que no estaba en arrayEtiquetasBusqueda (controladorResultados 249)");
 				}
-				
-				vistaResultados.revalidate();
-				vistaResultados.repaint();
 				
 			}
 			
